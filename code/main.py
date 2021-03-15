@@ -91,7 +91,9 @@ class Commands:
 	def session(self, name, conn, addr, message, args=None):
 		# reveives the messages and passes them to the evaluation
 		def receiveMessage():
-			msg_length = int(conn.recv(BUFFER).decode(FORMAT))
+			msg_length = conn.recv(BUFFER).decode(FORMAT)
+			print(msg_length)
+			msg_length = int(msg_length)
 
 			if msg_length:
 				msg = conn.recv(msg_length).decode(FORMAT)
