@@ -8,7 +8,7 @@ import socket as s
 import threading
 from subprocess import check_output
 
-HOST = "10.0.0.5"
+HOST = ""
 PORT = 420
 BUFFER = 1024
 FORMAT = "utf-8"
