@@ -15,7 +15,6 @@ DISCONNECT = "!dsc"
 
 server = s.socket(s.AF_INET, s.SOCK_STREAM)
 server.bind(ADDR)
-
 # saves active sessions
 sessions = {}
 session_ids = []
