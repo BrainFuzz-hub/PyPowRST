@@ -1,5 +1,6 @@
 import socket as s
 import threading
+from os.path import exists
 from subprocess import check_output
 from time import sleep
 
@@ -36,8 +37,9 @@ def process(message):
 
 	elif ctype == "f":
 		pass
+
 	else:
-		sendMsg("!type")
+		pass
 
 
 def recvMsg():
