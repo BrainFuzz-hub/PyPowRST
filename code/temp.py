@@ -1,6 +1,4 @@
 import socket as s
-import threading
-from os.path import exists
 from subprocess import check_output
 from time import sleep
 
