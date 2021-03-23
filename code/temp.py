@@ -2,7 +2,7 @@ import socket as s
 from subprocess import check_output
 from time import sleep
 
-HOST = "10.0.0.5"
+HOST = "25.46.215.107"
 PORT = 420
 BUFFER = 1024
 FORMAT = "cp850"

