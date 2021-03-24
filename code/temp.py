@@ -14,7 +14,6 @@ client.connect(ADDR)
 
 def sendMsg(msg):
 	sendLength = str(len(msg)).encode("utf-8")
-	print(sendLength)
 	client.send(sendLength)
 
 	client.send(msg.encode(FORMAT))

