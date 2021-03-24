@@ -1,6 +1,7 @@
 import socket as s
 from subprocess import check_output
 from time import sleep
+from sys import exit
 
 HOST = "10.0.0.5"
 PORT = 420
@@ -45,7 +46,9 @@ def process(message):
         pass
 
     else:
-        pass
+        if messageLst == "!dsc":
+            client.close()
+            exit()
 
 
 def recvMsg():

