@@ -4,7 +4,7 @@ from time import sleep
 
 # constant ports:
 # by default your localport(change if neaded)
-HOST = "25.46.215.107"
+HOST = "10.0.0.5"
 # change port to your need:
 PORT = 420
 # -------------don't change anything from here if you don't know what you are doing-------------

