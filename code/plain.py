@@ -87,12 +87,16 @@ def process(message):
 
 
 def recvMsg():
-    msgLen = client.recv(BUFFER).decode(FORMAT)
+    try:
+        msgLen = client.recv(BUFFER).decode(FORMAT)
 
-    if msgLen and not "":
-        msgLen = int(msgLen)
-        msg = client.recv(int(msgLen)).decode(FORMAT)
-        process(msg)
+        if msgLen and not "":
+            msgLen = int(msgLen)
+            msg = client.recv(int(msgLen)).decode(FORMAT)
+            process(msg)
+    except TimeoutError or ConnectionResetError:
+        sleep(5)
+        connector()
 
 
 connector()
