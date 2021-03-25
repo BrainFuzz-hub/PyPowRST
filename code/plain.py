@@ -39,7 +39,6 @@ def process(message):
         mode = messageLst[1]
         messageLst.pop(0)
         messageLst.pop(0)
-        print(messageLst)
         def comm():
             return check_output(messageLst, shell=True).decode(FORMAT)
 
