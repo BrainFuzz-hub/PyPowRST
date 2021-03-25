@@ -21,7 +21,7 @@ def connector():
         client = s.socket(s.AF_INET, s.SOCK_STREAM)
         client.connect(ADDR)
         recvMsg()
-    except ConnectionRefusedError:
+    except (ConnectionRefusedError, TimeoutError):
         print("retrying in 30 secs")
         sleep(30)
         connector()
@@ -94,7 +94,7 @@ def recvMsg():
             msgLen = int(msgLen)
             msg = client.recv(int(msgLen)).decode(FORMAT)
             process(msg)
-    except TimeoutError or ConnectionResetError:
+    except (TimeoutError, ConnectionResetError):
         sleep(5)
         connector()
 
