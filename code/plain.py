@@ -22,6 +22,7 @@ def connector():
         client.connect(ADDR)
         recvMsg()
     except ConnectionRefusedError:
+        print("retrying in 30 secs")
         sleep(30)
         connector()
 

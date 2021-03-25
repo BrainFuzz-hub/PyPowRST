@@ -98,7 +98,6 @@ class Commands:
 
         # delets the session and all its inforamtion
         def delete():
-            print(session_ids)
             sessions.pop(decId)
             session_ids.remove(decId)
             mainMenu()
