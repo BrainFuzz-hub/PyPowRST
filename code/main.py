@@ -4,11 +4,11 @@ from time import sleep
 
 # constant ports:
 # by default your localport(change if neaded)
-HOST = "10.0.0.5"
+HOST = "10.0.0.8"
 # change port to your need:
 PORT = 420
 # -------------don't change anything from here if you don't know what you are doing-------------
-BUFFER = 1024
+BUFFER = 4096
 ADDR = (HOST, PORT)
 FORMAT = "cp850"
 DISCONNECT = "!dsc"
