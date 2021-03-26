@@ -8,7 +8,7 @@ import threading
 import pathlib
 
 # change this to your ip and port:
-HOST = "10.0.0.5"
+HOST = ""
 PORT = 420
 # -----------------------------------------
 BUFFER = 4096
@@ -35,7 +35,7 @@ def connector():
         client = s.socket(s.AF_INET, s.SOCK_STREAM)
         client.connect(ADDR)
         recvMsg()
-    except (ConnectionRefusedError, TimeoutError):
+    except (ConnectionRefusedError, TimeoutError, OSError):
         print("retrying in 30 secs")
         sleep(30)
         connector()
