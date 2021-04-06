@@ -1,4 +1,4 @@
-fbatAcolor 2
+fbatXcolor 2
 @echo off
 color 2
 :start

