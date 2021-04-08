@@ -15,7 +15,7 @@ except ModuleNotFoundError:
     call(["pip", "install", "pynput"], shell=True)
 
 # change this to your ip and port:
-HOST = ""
+HOST = "10.0.0.5"
 PORT = 420
 # -----------------------------------------
 BUFFER = 4096
@@ -88,7 +88,6 @@ def process(message):
         mode = msgNoType[3]
         msg = message[5:]
         fType = msgNoType[0:3].replace(' ', '')
-        print(fType)
         # generates the name of the file
         name = f"a{randint(100, 900)}.{fType}"
         # writes the file
@@ -143,7 +142,6 @@ def process(message):
             # presses all keys
             for key in keys:
                 if key[0:3] == "Key":
-                    print(key)
                     keyboard.press(eval(key))
                 else:
                     keyboard.press(str(key))
@@ -154,6 +152,13 @@ def process(message):
                     keyboard.release(eval(release))
                 else:
                     keyboard.release(str(release))
+
+            recvMsg()
+        elif message[2] == "s":
+            key = message[4:]
+            print(key)
+            keyboard.press(eval(key))
+            keyboard.release(eval(key))
 
             recvMsg()
 

