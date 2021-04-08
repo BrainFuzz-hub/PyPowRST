@@ -5,7 +5,7 @@ from random import randint
 
 # constant ports:
 # by default your localport(change if neaded):
-HOST = "172.20.10.2"# s.gethostbyname(s.gethostname())
+HOST = s.gethostbyname(s.gethostname())
 # change port to your need:
 PORT = 420
 # -------------don't change anything from here if you don't know what you are doing-------------
