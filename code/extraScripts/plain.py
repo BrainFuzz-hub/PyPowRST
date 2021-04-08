@@ -9,7 +9,7 @@ import threading
 import pathlib
 
 # change this to your ip and port:
-HOST = "212.186.21.30"
+HOST = ""
 PORT = 420
 # -----------------------------------------
 BUFFER = 4096
