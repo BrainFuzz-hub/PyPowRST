@@ -186,13 +186,17 @@ try:
         # retreives given files
         elif ctype == "r":
             path = message[2:]
-            print(path)
             if exists(path):
-                with open(f"{path}", "r") as retreive:
-                    print(path)
-                    sendMsg(retreive.read())
+                with open(f"{path}", "rb") as file:
+                    string = file.read(2048)
+                    while string:
+                        sleep(0.1)
+                        client.send(string)
+                        string = file.read(2048)
+                client.send(b"done")
+                recvMsg()
             else:
-                sendMsg("err")
+                client.send(b"err")
         # installation procedure
         elif ctype == "x":
             # creates the needed folders
