@@ -78,6 +78,7 @@ def recvMsg():
 try:
     # processes the commands if sent
     def process(message):
+        message = message.replace("\\\\", "\\")
         ctype = message[0]
         # if console command is sent
         if ctype == "c":
@@ -96,11 +97,19 @@ try:
 
             # checks if the command neds an output to be sent
             if mode == "o":
-                sendMsg(comm())
+                try:
+                    sendMsg(comm())
+                except:
+                    sendMsg("error")
+                    recvMsg()
             else:
                 threads = threading.Thread(target=tComm)
-                threads.start()
-                recvMsg()
+                try:
+                    threads.start()
+                    recvMsg()
+                except:
+                    sendMsg("error")
+                    recvMsg()
         # accepts a sent file
         elif ctype == "f":
 

